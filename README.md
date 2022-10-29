@@ -1,3 +1,6 @@
+<img align="right" height="500em" src="https://raw.githubusercontent.com/gist/devPrates/74df21d3989dd8ded3d6b6b2fd8f0212/raw/582f2b7128491a775db9d15b8c9e6442814c2fdb/cardgit.svg"/>
+<p align="left"> <img src="https://komarev.com/ghpvc/?username=devPrates&color=green" alt="Profile views" /> </p>
+
 ## Olá! Eu sou o Gabriel Prates, desenvolvedor full stack Junior
 - 🌱 Estudando Análise e Desenvolvimento de Sistemas!
 - 🤔 Buscando sempre novas tecnologias!
@@ -7,8 +10,8 @@
   <a href="https://github.com/devPrates">
   <img height="180em" src="https://github-readme-stats.vercel.app/api?username=devPrates&show_icons=true&theme=dark&include_all_commits=true&count_private=true"/>
 </div><br>
-
-<div align="center"><br>
+<br><br>
+<div align="center">
   <img align="center" alt="HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
   <img align="center" alt="CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
   <img align="center" alt="javascript" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
