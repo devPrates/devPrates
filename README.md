@@ -11,13 +11,8 @@
 </div>
 
 ## 💻 Skils:
-<div align="center"><br>
-  <img align="center" alt="techjuliana-Js" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
-  <img align="center" alt="techjuliana-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">
-  <img align="center" alt="techjuliana-HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
-  <img align="center" alt="techjuliana-CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
-<div>
-### 📊 Linguagens:
+
+## 📊 Linguagens:
 ![](https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&theme=dark&hide_border=false&include_all_commits=false&count_private=false&layout=compact)
 
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=8236fd&height=120&section=footer"/>
