@@ -1,4 +1,4 @@
-[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=fff&size=35&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+e+Desenvolvimento+de+Sistemas+a;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=fff&size=40&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+de+Sistemas;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
 
 ## Redes Sociais:
 [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white)](https://instagram.com/Gprates404) [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/gabriel-prates-bitencourt-5b1b77249/) 
