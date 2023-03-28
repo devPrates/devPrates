@@ -12,8 +12,4 @@
 ### 📊 Linguagens:
 ![](https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&theme=dark&hide_border=false&include_all_commits=false&count_private=false&layout=compact)
 
----
-
-
-<!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=8236fd&height=120&section=footer"/>
