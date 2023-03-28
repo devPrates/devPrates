@@ -1,3 +1,5 @@
+<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=8236fd&height=120&section=header"/>
+
 [![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=fff&size=40&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+de+Sistemas;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
 
 ## Redes Sociais:
@@ -12,3 +14,4 @@
 [![](https://visitcount.itsvg.in/api?id=devPrates&icon=0&color=0)](https://visitcount.itsvg.in)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
+<img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=8236fd&height=120&section=footer"/>
