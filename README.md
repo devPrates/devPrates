@@ -2,8 +2,9 @@
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=bc90db&size=40&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+de+Sistemas;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
 
-<div class="center">
+
 [![](https://visitcount.itsvg.in/api?id=devPrates&icon=0&color=0)](https://visitcount.itsvg.in)
+<div center>
 ## 🔗 Redes Sociais:
 <div> 
   <a href="https://www.instagram.com/gprates404" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white"</a>
