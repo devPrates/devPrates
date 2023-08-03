@@ -2,7 +2,7 @@
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=bc90db&size=40&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+de+Sistemas;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
 
-
+<div class="center">
 [![](https://visitcount.itsvg.in/api?id=devPrates&icon=0&color=0)](https://visitcount.itsvg.in)
 ## 🔗 Redes Sociais:
 <div> 
@@ -26,5 +26,5 @@
 <div>   
   <img width="41%" height="215px"  src="https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&layout=compact&hide_border=true&title_color=fff&text_color=ccc&bg_color=0d1117" />
 </div>
-
+</div>
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=8236fd&height=120&section=footer"/>
