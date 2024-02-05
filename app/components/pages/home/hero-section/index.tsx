@@ -2,6 +2,7 @@ import { Button } from '@/app/components/button'
 import { TechBadge } from '@/app/components/tech-badge'
 import Image from 'next/image'
 import { HiArrowNarrowRight } from 'react-icons/hi'
+import './style.css'
 import {
   TbBrandGithub,
   TbBrandLinkedin,
@@ -76,7 +77,7 @@ export const HeroSection = () => {
           height={404}
           src="/images/profile-pic.png"
           alt="foto de perfil do Gabriel Prates"
-          className="w-[300px] h-[300px] lg:w-[420px] lg:h-[404px] mb-6 lg:mb-0 shadow-2xl rounded-lg object-cover"
+          className="w-[300px] h-[300px] lg:w-[420px] lg:h-[404px] mb-6 lg:mb-0 shadow-2xl rounded-lg object-cover home__img"
         />
       </div>
     </section>
