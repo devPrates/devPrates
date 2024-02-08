@@ -11,7 +11,7 @@ const NAV_ITENS = [
   },
   {
     label: 'Projetos',
-    href: '/projetos',
+    href: '/projects',
   },
 ]
 

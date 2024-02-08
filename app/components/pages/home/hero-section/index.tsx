@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/app/components/button'
 import { TechBadge } from '@/app/components/tech-badge'
 import Image from 'next/image'
@@ -30,6 +32,12 @@ const MOCK_CONTACTS = [
 ]
 
 export const HeroSection = () => {
+  const hendleProjects = () => {
+    const projectSection = document.querySelector('#projects-dt')
+    if (projectSection) {
+      projectSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
   return (
     <section className="w-full lg:h-[750px] bg-hero-image bg-cover bg-center bg-no-repeat flex flex-col justify-center pb-10 sm:pb-32 py-32 lg:pb-[110px]">
       <div className="container flex items-start justify-between flex-col-reverse lg:flex-row">
@@ -51,8 +59,8 @@ export const HeroSection = () => {
           </div>
 
           <div className="mt-6 lg:mt-10 flex sm:items-center sm:gap-5 flex-col sm:flex-row">
-            <Button className="w-max shadow-button">
-              Entre em Contato
+            <Button className="w-max shadow-button" onClick={hendleProjects}>
+              Ver meus Projetos
               <HiArrowNarrowRight size={18} />
             </Button>
 
