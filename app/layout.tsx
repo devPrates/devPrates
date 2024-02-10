@@ -6,6 +6,18 @@ import { ContactForm } from './components/cotact-form'
 import { Footer } from './components/footer'
 import { BackToTop } from './components/back-to-top'
 
+export const metadata = {
+  title: {
+    default: 'Home',
+    template: '%s | DevPrates',
+  },
+  icons: [
+    {
+      url: '/favicon.svg',
+    },
+  ],
+}
+
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
@@ -21,11 +33,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className={`${inter.variable} ${plexMono.variable}`}>
       <body>
+        <BackToTop />
         <Header />
         {children}
         <ContactForm />
         <Footer />
-        <BackToTop />
       </body>
     </html>
   )
