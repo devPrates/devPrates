@@ -43,9 +43,7 @@ export const HeroSection = ({ homeInfo }: HomeSectionProps) => {
               <TechBadge
                 name={tech.name}
                 key={`intro-tech-${tech.name}`}
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0 }}
+                {...techBadgeAnimation}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               />
             ))}
