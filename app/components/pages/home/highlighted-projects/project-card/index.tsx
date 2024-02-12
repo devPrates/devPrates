@@ -64,6 +64,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
           {project.technologies.map((tech, i) => (
             <TechBadge
               name={tech.name}
+              icon={tech.iconSvg}
               key={`${project.title}-tech-${tech.name}`}
               {...techBadgeAnimation}
               transition={{ duration: 0.2, delay: 0.5 + i * 0.1 }}

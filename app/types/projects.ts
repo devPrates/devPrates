@@ -8,6 +8,7 @@ export type KnownTech = {
 
 export type Technology = {
   name: string
+  iconSvg: string
 }
 
 export type ProjectSection = {

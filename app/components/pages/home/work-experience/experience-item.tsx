@@ -91,6 +91,7 @@ export const ExperienceItem = ({ experience }: ExperienceItemProps) => {
           {technologies.map((tech, i) => (
             <TechBadge
               name={tech.name}
+              icon={tech.iconSvg}
               key={`experience-${companyName}-tech-${tech.name}`}
               {...techBadgeAnimation}
               transition={{ duration: 0.2, delay: i * 0.1 }}

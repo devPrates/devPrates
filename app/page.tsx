@@ -37,6 +37,7 @@ const getPageData = async (): Promise<HomePageData> => {
           shortDescription
           technologies {
             name
+            iconSvg
           }
         }
       }
