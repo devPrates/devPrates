@@ -14,6 +14,7 @@ const getPageData = async (): Promise<HomePageData> => {
         }
         technologies {
           name
+          iconSvg
         }
         profilePicture {
           url
@@ -53,6 +54,7 @@ const getPageData = async (): Promise<HomePageData> => {
         }
         technologies {
           name
+          iconSvg
         }
       }
     }

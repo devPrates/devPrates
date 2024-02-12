@@ -38,10 +38,11 @@ export const HeroSection = ({ homeInfo }: HomeSectionProps) => {
             <RichText content={homeInfo.introduction.raw} />
           </div>
 
-          <div className="flex flex-wrap gap-x-2 gap-y-3 lg:max-w-[340px]">
+          <div className="flex flex-wrap gap-x-2 gap-y-3 lg:max-w-[440px]">
             {homeInfo.technologies.map((tech, i) => (
               <TechBadge
                 name={tech.name}
+                icon={tech.iconSvg}
                 key={`intro-tech-${tech.name}`}
                 {...techBadgeAnimation}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
@@ -50,7 +51,10 @@ export const HeroSection = ({ homeInfo }: HomeSectionProps) => {
           </div>
 
           <div className="mt-6 lg:mt-10 flex sm:items-center sm:gap-5 flex-col sm:flex-row">
-            <Button className="w-max shadow-button" onClick={hendleProjects}>
+            <Button
+              className="w-ma font-semibold shadow-button"
+              onClick={hendleProjects}
+            >
               Ver meus Projetos
               <HiArrowNarrowDown size={20} />
             </Button>
@@ -79,7 +83,7 @@ export const HeroSection = ({ homeInfo }: HomeSectionProps) => {
           className="origin-center"
         >
           <Image
-            className="w-[300px] h-[300px] lg:w-[420px] lg:h-[404px] mb-6 lg:mb-0 shadow-2xl rounded-lg object-cover home__img"
+            className="w-[300px] h-[300px] lg:w-[420px] lg:h-[404px] mb-6 lg:mb-0 rounded-lg object-cover home__img"
             width={420}
             height={404}
             src={homeInfo.profilePicture.url}
