@@ -34,6 +34,7 @@ const getProjectDetails = async (slug: string): Promise<ProjectPageData> => {
       }
       technologies {
         name
+        iconSvg
       }
       liveProjectUrl
       githubUrl

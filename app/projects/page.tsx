@@ -19,6 +19,7 @@ const getPageData = async (): Promise<ProjectsPageData> => {
       }
       technologies {
         name
+        iconSvg
       }
     }
   }

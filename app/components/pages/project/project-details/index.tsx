@@ -17,7 +17,7 @@ type ProjectDatailsProps = {
 
 export const ProjectDetails = ({ project }: ProjectDatailsProps) => {
   return (
-    <section className="w-full sm:min-h-[750px] flex flex-col items-center justify-end relative pb-10 sm:pb-24 px-6 overflow-hidden">
+    <section className="w-full sm:min-h-[750px] flex flex-col items-center justify-end relative pb-10 sm:pb-24 py-24 px-6 overflow-hidden">
       <div
         className="absolute inset-0 z-[-1] opacity-20"
         style={{
@@ -41,6 +41,7 @@ export const ProjectDetails = ({ project }: ProjectDatailsProps) => {
         {project.technologies.map((tech, i) => (
           <TechBadge
             name={tech.name}
+            icon={tech.iconSvg}
             key={tech.name}
             {...techBadgeAnimation}
             transition={{ duration: 0.3, delay: i * 0.1 }}
