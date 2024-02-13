@@ -7,6 +7,12 @@ export type Social = {
   iconSvg: string
 }
 
+export type Socials = {
+  url: string
+  iconSvg: string
+  name: string
+}
+
 export type HomePageInfo = {
   introduction: {
     raw: RichTextContent
