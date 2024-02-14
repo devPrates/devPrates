@@ -31,7 +31,7 @@ export const ProjectDetails = ({ project }: ProjectDatailsProps) => {
         className="text-center items-center sm:[&>h3]:text-4xl"
       />
       <motion.div
-        className="text-gray-400 text-center max-w-[640px] my-4 sm:my-6 text-sm sm:text-base"
+        className="text-gray-400 text-justify max-w-[640px] my-4 sm:my-6 text-sm sm:text-base"
         {...fadeUpAnimation}
       >
         <RichText content={project.description.raw} />
