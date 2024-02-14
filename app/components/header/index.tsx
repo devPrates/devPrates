@@ -27,8 +27,8 @@ export const Header = () => {
       <div className="container flex items-center justify-between">
         <Link href={'/'}>
           <Image
-            width={80}
-            height={80}
+            width={60}
+            height={60}
             src="/favicon.png"
             alt="Logo devPrates"
           />
