@@ -1,3 +1,5 @@
+'use client'
+
 import { SectionTitle } from '@/app/components/section-title'
 import { ExperienceItem } from './experience-item'
 import {
@@ -9,6 +11,7 @@ import { FcViewDetails } from 'react-icons/fc'
 import { MdDownloading } from 'react-icons/md'
 import { Link } from '@/app/components/link'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 type WorkExperienceProps = {
   experiences: IWorkExperience[]
@@ -34,7 +37,14 @@ export const WorkExperience = ({
         <div className="mt-6">
           <p className="text-lg font-semibold my-5">Meus Certificados:</p>
           {courses?.map((curso, i) => (
-            <div key={i} className="flex gap-2 items-center mt-2">
+            <motion.div
+              key={i}
+              className="flex gap-2 items-center mt-2"
+              initial={{ opacity: 0, x: -100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.3, delay: i * 0.1 }}
+            >
               <Image
                 className="rounded-lg"
                 width={25}
@@ -50,19 +60,19 @@ export const WorkExperience = ({
               >
                 <h3>{curso.name}</h3>
               </a>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         <div className="mt-6 flex gap-3 flex-wrap">
           <Link href="/curriculo">
-            <Button>
+            <Button disabled>
               <FcViewDetails size={20} />
               Ver Curriculo
             </Button>
           </Link>
           <Link href="/curriculo_mock.pdf" target="_blank">
-            <Button>
+            <Button disabled>
               <MdDownloading size={20} />
               Baixar Curriculo
             </Button>
