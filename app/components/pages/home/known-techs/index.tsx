@@ -9,7 +9,6 @@ type KnownTechProps = {
 }
 
 export const KnownTechs = ({ techs }: KnownTechProps) => {
-  console.log(techs)
   return (
     <section className="container py-16">
       <SectionTitle subtitle="competências" title="Conhecimentos" />

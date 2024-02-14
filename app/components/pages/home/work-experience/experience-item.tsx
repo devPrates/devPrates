@@ -79,7 +79,7 @@ export const ExperienceItem = ({ experience }: ExperienceItemProps) => {
           <span className="text-gray-500">
             {formattedStartDate} • {formattedSEndDate} • ({formattedDuration})
           </span>
-          <div className="text-gray-400">
+          <div className="text-gray-400 text-justify">
             <RichText content={description.raw} />
           </div>
         </div>

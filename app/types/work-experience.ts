@@ -15,3 +15,8 @@ export type WorkExperience = {
     raw: RichTextContent
   }
 }
+
+export type cources = {
+  name: string
+  credential: string
+}

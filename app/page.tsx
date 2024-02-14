@@ -58,6 +58,10 @@ const getPageData = async (): Promise<HomePageData> => {
           iconSvg
         }
       }
+      courses {
+        name
+        credential 
+      }
     }
   `
 
@@ -65,14 +69,14 @@ const getPageData = async (): Promise<HomePageData> => {
 }
 
 export default async function Home() {
-  const { page: pageData, workExperiences } = await getPageData()
+  const { page: pageData, workExperiences, courses } = await getPageData()
 
   return (
     <>
       <HeroSection homeInfo={pageData} />
       <KnownTechs techs={pageData.knownTechs} />
       <HighlightedProjects projects={pageData.highlightProjects} />
-      <WorkExperience experiences={workExperiences} />
+      <WorkExperience experiences={workExperiences} courses={courses} />
     </>
   )
 }
