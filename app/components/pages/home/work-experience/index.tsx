@@ -66,13 +66,13 @@ export const WorkExperience = ({
 
         <div className="mt-6 flex gap-3 flex-wrap">
           <Link href="/curriculo">
-            <Button disabled>
+            <Button>
               <FcViewDetails size={20} />
               Ver Curriculo
             </Button>
           </Link>
-          <Link href="/curriculo_mock.pdf" target="_blank">
-            <Button disabled>
+          <Link href="/curriculo.pdf" target="_blank">
+            <Button>
               <MdDownloading size={20} />
               Baixar Curriculo
             </Button>
