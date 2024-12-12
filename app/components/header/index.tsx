@@ -11,8 +11,8 @@ const NAV_ITENS = [
     href: '/',
   },
   {
-    label: 'Projetos',
-    href: '/projects',
+    label: 'Currículo',
+    href: '/curriculo',
   },
 ]
 
@@ -27,9 +27,9 @@ export const Header = () => {
       <div className="container flex items-center justify-between">
         <Link href={'/'}>
           <Image
-            width={80}
-            height={80}
-            src="/images/logo.svg"
+            width={50}
+            height={50}
+            src="/icon.svg"
             alt="Logo devPrates"
           />
         </Link>
