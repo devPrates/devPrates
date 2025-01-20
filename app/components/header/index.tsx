@@ -11,8 +11,8 @@ const NAV_ITENS = [
     href: '/',
   },
   {
-    label: 'Currículo',
-    href: '/curriculo',
+    label: 'Projetos',
+    href: '/projects',
   },
 ]
 
