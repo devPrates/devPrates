@@ -34,24 +34,22 @@ export default async function Curriculo() {
 
             <h1 className="text-2xl mt-10 font-semibold">Objetivo</h1>
             <p className="mt-1 text-justify">
-              Sou um profissional motivado e dedicado, com uma paixão
-              por resolver problemas complexos e alcançar resultados
-              excepcionais. Com uma sólida formação acadêmica em Análise e
-              Desenvolvimento de Sistemas e com experiência prática em
-              alguns projetos desenvolvidos por mim. Minha trajetória profissional me
-              permitiu desenvolver habilidades, como resolução de problemas,
-              liderança, comunicação e trabalho em equipe. Além disso, estou sempre buscando 
-              oportunidades de aprendizado e crescimento. Sou adaptável a novos ambientes e
-              rápido em assimilar novos conceitos e tecnologias. Estou
-              entusiasmado com a possibilidade de contribuir e trabalharmos
-              juntos!
+              Sou um profissional motivado e dedicado, com uma paixão por
+              resolver problemas complexos e alcançar resultados excepcionais.
+              Com uma sólida formação acadêmica em Análise e Desenvolvimento de
+              Sistemas e com experiência prática em alguns projetos
+              desenvolvidos por mim. Minha trajetória profissional me permitiu
+              desenvolver habilidades, como resolução de problemas, liderança,
+              comunicação e trabalho em equipe. Além disso, estou sempre
+              buscando oportunidades de aprendizado e crescimento. Sou adaptável
+              adaptável a novos ambientes e rápido em assimilar novos conceitos
+              e tecnologias. Estou entusiasmado com a possibilidade de
+              contribuir e trabalharmos juntos!
             </p>
 
             <h1 className="text-2xl mt-10 font-semibold mb-3">Experiência</h1>
             <div>
-              <span className="text-sm text-gray-600">
-                fev 2023 – dez 2024
-              </span>
+              <span className="text-sm text-gray-600">fev 2023 – dez 2024</span>
               <h3 className="font-semibold">
                 Suporte aos Sites | Prefeitura de Naviraí
               </h3>
