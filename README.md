@@ -1,6 +1,6 @@
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=06B6D4&height=120&section=header"/>
 
-# Seja bem-vindo
+<h1 align="center"><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Hand%20gestures/Waving%20Hand%20Light%20Skin%20Tone.png" alt="Waving Hand Light Skin Tone" width="40" height="40" /> Seja bem-vindo!</h1>
 
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Graduation%20Cap.webp" alt="Graduation Cap" width="30" height="30" /> Sobre Mim
 Olá, meu nome é **Gabriel Prates** e sou um desenvolvedor **Full Stack** e também sou estudante de **Análise e Desenvolvimento de Sistemas**. Com mais de **1 ano de experiência**, meu objetivo é criar soluções bonitas e funcionais para todos os tipos de usuários, sou adaptável a novos ambientes e rápido em assimilar novos conceitos e tecnologias. Estou sempre aberto a novas oportunidades e desafios.
@@ -42,7 +42,7 @@ Olá, meu nome é **Gabriel Prates** e sou um desenvolvedor **Full Stack** e tam
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Bar%20Chart.webp" alt="Bar Chart" width="30" height="30" /> Estatísticas do GitHub
 ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&layout=compact&theme=radicaltitle_color=fff&text_color=ccc&bg_color=06B6D4)
 
-### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Inbox%20Tray.webp" alt="Inbox Tray" width="30" height="30" /> Como me encontrar
+## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Inbox%20Tray.webp" alt="Inbox Tray" width="30" height="30" /> Como me encontrar
 - **LinkedIn:** [Meu LinkedIn](https://www.linkedin.com/in/devprates/)
 - **Portfólio:** [Meu Portfólio](https://devprates.vercel.app/)
 - **Email:** [Meu Email](mailto:devprates@gmail.com)
