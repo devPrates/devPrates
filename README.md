@@ -1,30 +1,52 @@
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=06B6D4&height=120&section=header"/>
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com/?color=06B6D4&size=40&center=true&vCenter=true&width=1000&lines=Olá,+meu+nome+é+Gabriel+Prates;E+sou+estudade+de+Análise+de+Sistemas;Seja+bem-vindo!+:%29)](https://git.io/typing-svg)
+# <img align="center" alt="techjuliana-HTML" height="40" width="40" src="https://cdn.jsdelivr.net/gh/Readme-Workflows/Readme-Icons@main/icons/gifs/wave.gif"> Seja bem-vindo!
 
+## 🚀 Sobre mim
+Olá, meu nome é **Gabriel Prates** e sou um desenvolvedor **Full Stack** e também sou estudante de **Análise e Desenvolvimento de Sistemas**. Com mais de **1 ano de experiência**, meu objetivo é criar soluções bonitas e funcionais para todos os tipos de usuários, sou adaptável a novos ambientes e rápido em assimilar novos conceitos e tecnologias. Estou sempre aberto a novas oportunidades e desafios.
 
-[![](https://visitcount.itsvg.in/api?id=devPrates&icon=0&color=0)](https://visitcount.itsvg.in)
+## 🛠 Tecnologias e Ferramentas
+<table align="center">
+  <tr>
+    <td><strong>Frontend</strong></td>
+    <td>
+      <a href="https://skillicons.dev">
+        <img src="https://skillicons.dev/icons?i=typescript,nextjs,angular,php,tailwind," />
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Backend</strong></td>
+    <td>
+      <a href="https://skillicons.dev">
+        <img src="https://skillicons.dev/icons?i=java,nodejs,spring,nestjs,prisma,laravel,docker" />
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Banco de Dados</strong></td>
+    <td>
+      <a href="https://skillicons.dev">
+        <img src="https://skillicons.dev/icons?i=sqlite,postgres,mysql,mongodb,supabase" />
+      </a>
+    </td>
+  </tr>
+</table>
 
-## 🔗 Redes Sociais:
-<div> 
-  <a href="https://www.instagram.com/gprates404" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white"</a>
-<a href="https://www.linkedin.com/in/devPrates/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" style="border-radius: 30px" target="_blank"></a> 
-</div>
+### 📌 Principais Projetos
+- **[Sistema de Trocas de Aulas](https://classexchange.vercel.app/)**: Uma plataforma que facilita a substituição de aulas entre professores, coordenadores e diretores, com notificações automáticas para alunos.
+- **[Sistema Puro Queijo](sistema-puro-queijo.vercel.app)**: Este sistema foi desenvolvido para a empresa Puro Queijo de Naviraí, com o objetivo de facilitar a gestão de categorias e produtos, incluindo a criação, edição e visualização de informações sobre os produtos.
+- **[Curso React para o IFMS](curso-react-murex.vercel.app)**: Este repositório contém os materiais e informações relacionados ao mini curso de React js, ofertado por mim ao Instituto Federal de Mato Grosso do Sul (IFMS) - Câmpus Naviraí, MS.
 
-## 💻 Skils:
+### 📊 Estatísticas do GitHub
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&layout=compact&theme=radicaltitle_color=fff&text_color=ccc&bg_color=06B6D4)
+
+### 📫 Como me encontrar
+- **LinkedIn:** [Meu LinkedIn](https://www.linkedin.com/in/devprates/)
+- **Portfólio:** [Meu Portfólio](https://devprates.vercel.app/)
+- **Email:** [Meu Email](mailto:devprates@gmail.com)
+
+💡 Sempre aberto a novas oportunidades e colaborações!
   
-<div><br>
-  
-  <img align="center" alt="techjuliana-HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
-  <img align="center" alt="techjuliana-CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
-  <img align="center" alt="techjuliana-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">
-  <img align="center" alt="techjuliana-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg">
-  <img align="center" alt="techjuliana-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg">
-</div>
-  
 
-## 📊 Linguagens:
-<div>   
-  <img width="41%" height="215px"  src="https://github-readme-stats.vercel.app/api/top-langs/?username=devPrates&layout=compact&hide_border=true&title_color=fff&text_color=ccc&bg_color=06B6D4" />
-</div>
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=06B6D4&height=120&section=footer"/>
