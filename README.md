@@ -1,9 +1,6 @@
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=06B6D4&height=120&section=header"/>
 
-<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 30px;">
-  <div><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Hand%20gestures/Waving%20Hand%20Light%20Skin%20Tone.png" alt="Waving Hand Light Skin Tone" width="40" height="40" /></div>
-  <div style="font-size: 40px; line-height: 0; font-weight: bold;"> Seja bem-vindo!</div>
-</div>
+# Seja bem-vindo
 
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Graduation%20Cap.webp" alt="Graduation Cap" width="30" height="30" /> Sobre Mim
 Olá, meu nome é **Gabriel Prates** e sou um desenvolvedor **Full Stack** e também sou estudante de **Análise e Desenvolvimento de Sistemas**. Com mais de **1 ano de experiência**, meu objetivo é criar soluções bonitas e funcionais para todos os tipos de usuários, sou adaptável a novos ambientes e rápido em assimilar novos conceitos e tecnologias. Estou sempre aberto a novas oportunidades e desafios.
