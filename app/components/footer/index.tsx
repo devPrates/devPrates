@@ -8,9 +8,9 @@ export const Footer = () => {
         Made with by
         <strong className="font-medium">Gabriel Prates</strong>
         <Image
-          width={20}
-          height={20}
-          src="/icon.svg"
+          width={30}
+          height={30}
+          src="/icone.svg"
           alt="Logo Gabriel Prates"
         />
       </span>
