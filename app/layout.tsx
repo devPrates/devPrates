@@ -8,6 +8,9 @@ import { BackToTop } from './components/back-to-top'
 import { Toaster } from './components/toaster'
 
 export const metadata = {
+  metadataBase: new URL(
+    'https://devprates-htzm-8gmj05xq0-devprates-projects.vercel.app',
+  ),
   title: {
     default: 'Home',
     template: '%s | DevPrates',
