@@ -22,6 +22,13 @@ export const WorkExperience = ({
   experiences,
   courses,
 }: WorkExperienceProps) => {
+  // Ordena experiências do mais recente para o mais antigo
+  const sortedExperiences = [...(experiences || [])].sort((a, b) => {
+    const aDate = new Date(a.endDate || a.startDate).getTime()
+    const bDate = new Date(b.endDate || b.startDate).getTime()
+    return bDate - aDate
+  })
+
   return (
     <section className="container py-16 flex gap-10 md:gap-4 lg:gap-16 flex-col md:flex-row">
       <div className="max-w-[420px]">
@@ -81,7 +88,7 @@ export const WorkExperience = ({
       </div>
 
       <div className="flex flex-col gap-4">
-        {experiences?.map((experience) => (
+        {sortedExperiences.map((experience) => (
           <ExperienceItem
             key={experience.companyName}
             experience={experience}

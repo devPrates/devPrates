@@ -15,71 +15,106 @@ export default async function Curriculo() {
               Gabriel Prates Bitencourt
             </h1>
             <div className="flex flex-wrap gap-2 text-sm mt-2">
-              <p>(67)99177-6488</p>
+              <p>Jardim Progresso, Naviraí – MS</p>
               <span>|</span>
-              <a href="#" className="underline">
+              <p>(67) 99177-6488</p>
+              <span>|</span>
+              <a href="mailto:devprates@gmail.com" className="underline">
                 devprates@gmail.com
               </a>
               <span>|</span>
-              <p>Jardim Progresso, Naviraí - MS</p>
-              <span>|</span>
               <a
-                href="www.linkedin.com/in/devprates"
+                href="https://www.linkedin.com/in/devprates"
                 className="underline"
                 target="_blank"
+                rel="noreferrer"
               >
-                www.linkedin.com/in/devprates
+                linkedin.com/in/devprates
+              </a>
+              <span>|</span>
+              <a
+                href="https://devprates.vercel.app"
+                className="underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                devprates.vercel.app
               </a>
             </div>
 
-            <h1 className="text-2xl mt-10 font-semibold">Objetivo</h1>
+            <h1 className="text-2xl mt-10 font-semibold">
+              Objetivo Profissional
+            </h1>
             <p className="mt-1 text-justify">
-              Sou um profissional motivado e dedicado, com uma paixão por
-              resolver problemas complexos e alcançar resultados excepcionais.
-              Com uma sólida formação acadêmica em Análise e Desenvolvimento de
-              Sistemas e com experiência prática em alguns projetos
-              desenvolvidos por mim. Minha trajetória profissional me permitiu
-              desenvolver habilidades, como resolução de problemas, liderança,
-              comunicação e trabalho em equipe. Além disso, estou sempre
-              buscando oportunidades de aprendizado e crescimento. Sou adaptável
-              adaptável a novos ambientes e rápido em assimilar novos conceitos
-              e tecnologias. Estou entusiasmado com a possibilidade de
-              contribuir e trabalharmos juntos!
+              Atuar como <strong>Programador e Analista de Dados</strong>,
+              aplicando conhecimento técnico em desenvolvimento e análise para
+              otimizar processos internos e apoiar decisões estratégicas. Busco
+              contribuir com soluções inovadoras integrando tecnologia, dados e
+              eficiência operacional.
             </p>
 
             <h1 className="text-2xl mt-10 font-semibold mb-3">Experiência</h1>
             <div>
+              <span className="text-sm text-gray-600">jun 2025 – ago 2025</span>
+              <h3 className="font-semibold">
+                Analista de Redes e Telecom | Vouu Telecom
+              </h3>
+              <p className="mt-2">
+                Responsável pela administração e manutenção da infraestrutura de
+                redes, garantindo segurança e estabilidade da comunicação
+                interna e externa.
+              </p>
+              <p className="text-sm font-semibold mt-2">
+                Principais atividades:
+              </p>
+              <ul className="list-disc list-inside">
+                <li className="ml-4">
+                  Atendimento e suporte técnico aos usuários.
+                </li>
+                <li className="ml-4">
+                  Instalação, configuração e monitoramento de equipamentos de
+                  rede.
+                </li>
+                <li className="ml-4">
+                  Resolução de falhas e implementação de melhorias de
+                  performance e segurança.
+                </li>
+                <li className="ml-4">
+                  Apoio em sistemas de telefonia digital (VoIP).
+                </li>
+                <li className="ml-4">
+                  Participação em projetos de expansão da infraestrutura de
+                  comunicação.
+                </li>
+              </ul>
+            </div>
+
+            <div className="mt-5">
               <span className="text-sm text-gray-600">fev 2023 – dez 2024</span>
               <h3 className="font-semibold">
                 Suporte aos Sites | Prefeitura de Naviraí
               </h3>
               <p className="mt-2">
-                Atendimento aos usuários, manutenção, otimização e resolução de
-                problemas relacionados ao sites desenvolvidos com PHP e
-                WordPress para a Prefeitura de Naviraí.
+                Atuação no suporte e manutenção de sites institucionais
+                desenvolvidos em <strong>PHP</strong> e
+                <strong> WordPress</strong>, com foco em desempenho e segurança.
+              </p>
+              <p className="text-sm font-semibold mt-2">
+                Principais atividades:
               </p>
               <ul className="list-disc list-inside">
                 <li className="ml-4">
-                  Prover suporte técnico e assistência aos clientes que utilizam
-                  o sistema.
+                  Diagnóstico e resolução de falhas técnicas e de código.
                 </li>
                 <li className="ml-4">
-                  Diagnosticar e resolver problemas técnicos, como erros de
-                  código, plugins conflitantes, falhas de segurança e problemas
-                  de desempenho.
+                  Atualização de sistemas e implementação de melhorias.
                 </li>
                 <li className="ml-4">
-                  Realizar atualizações de software, patches de segurança e
-                  melhorias de desempenho no site.
+                  Colaboração com a equipe de desenvolvimento na criação de
+                  novos recursos.
                 </li>
                 <li className="ml-4">
-                  Colaborar com a equipe de desenvolvimento para implementar
-                  novos recursos, corrigir bugs e garantir a estabilidade do
-                  site.
-                </li>
-                <li className="ml-4">
-                  Gerenciar backups regulares e procedimentos de recuperação de
-                  desastres para garantir a integridade dos dados dos usuários.
+                  Gerenciamento de backups e recuperação de dados.
                 </li>
               </ul>
             </div>
@@ -90,15 +125,25 @@ export default async function Curriculo() {
                 Assistente de TI | Exército Brasileiro
               </h3>
               <p className="mt-2">
-                Atendimento aos usuários, manutenção, otimização e resolução de
-                Manutenção de Computadores, Manutenção de interfaces utilizando
-                HTML, CSS e JavaScript e treinamento do sistema para controle de
-                frotas e Abastecimento do Exército Brasileiro.
+                Responsável pela manutenção de computadores e desenvolvimento de
+                interfaces web com
+                <strong> HTML</strong>, <strong>CSS</strong> e{' '}
+                <strong>JavaScript</strong>.
+              </p>
+              <p className="text-sm font-semibold mt-2">
+                Principais atividades:
               </p>
               <ul className="list-disc list-inside">
-                <li className="ml-4">Manutenção de Computadores</li>
-                <li className="ml-4">Manutenção de interfaces</li>
-                <li className="ml-4">treinamento do sistema</li>
+                <li className="ml-4">
+                  Manutenção preventiva e corretiva de equipamentos.
+                </li>
+                <li className="ml-4">
+                  Desenvolvimento e atualização de interfaces do sistema de
+                  controle de frotas.
+                </li>
+                <li className="ml-4">
+                  Treinamento de usuários no uso do sistema interno.
+                </li>
               </ul>
             </div>
 
@@ -106,49 +151,69 @@ export default async function Curriculo() {
             <ul className="list-disc list-inside">
               <li className="ml-4">
                 <strong>Análise e Desenvolvimento de Sistemas</strong> -
-                Instituto Federal de ciência e tecnologia do Mato Grosso do Sul
-                (IFMS) - Naviraí | Cursando.
-              </li>
-            </ul>
-
-            <h1 className="text-2xl mt-10 font-semibold">Idiomas</h1>
-            <ul className="list-disc list-inside">
-              <li className="ml-4">
-                <strong>Inglês</strong> - Intermediário
+                Instituto Federal de Ciência e Tecnologia do Mato Grosso do Sul
+                (IFMS) – Naviraí | <em>Cursando</em>.
               </li>
             </ul>
 
             <h1 className="text-2xl mt-10 font-semibold">
-              Informações Adicionais
+              Formações Complementares
             </h1>
             <ul className="list-disc list-inside">
               <li className="ml-4">
-                <strong>Formação Next.js</strong> - Alura | Conclusão: jan 2024
+                <strong>Next.js</strong> – jan 2025
               </li>
               <li className="ml-4">
-                <strong>Formação APIs com Express</strong> - Alura | Conclusão:
-                jan 2024
+                <strong>APIs com Express</strong> – jan 2025
               </li>
               <li className="ml-4">
-                <strong>Formação Modelagem de dados</strong> - Alura |
-                Conclusão: jan 2024
+                <strong>Modelagem de Dados</strong> – jan 2025
               </li>
               <li className="ml-4">
-                <strong>Formação PostgreSQL</strong> - Alura | Conclusão: jan
-                2024
+                <strong>PostgreSQL</strong> – jan 2025
               </li>
               <li className="ml-4">
-                <strong>Formação MongoDB</strong> - Alura | Conclusão: dez 2023
+                <strong>MongoDB</strong> – dez 2024
               </li>
               <li className="ml-4">
-                <strong>Formação Começando em DevOps</strong> - Alura |
-                Conclusão: dez 2023
+                <strong>DevOps: Fundamentos</strong> – dez 2024
               </li>
               <li className="ml-4">
-                <strong>Formação TypeScript</strong> - Alura | Conclusão: out
-                2024
+                <strong>TypeScript</strong> – out 2024
               </li>
             </ul>
+
+            <h1 className="text-2xl mt-10 font-semibold">
+              Principais Competências
+            </h1>
+            <ul className="list-disc list-inside">
+              <li className="ml-4">
+                Desenvolvimento Web (Next.js, TypeScript, Node.js, Express,
+                WordPress)
+              </li>
+              <li className="ml-4">
+                Modelagem e Análise de Dados (SQL, PostgreSQL, MongoDB)
+              </li>
+              <li className="ml-4">Automação de Processos</li>
+              <li className="ml-4">
+                Lógica de Programação e Estrutura de Dados
+              </li>
+              <li className="ml-4">
+                Suporte Técnico e Infraestrutura de Redes
+              </li>
+              <li className="ml-4">Trabalho em equipe e comunicação eficaz</li>
+            </ul>
+
+            <h1 className="text-2xl mt-10 font-semibold">
+              Resumo Profissional
+            </h1>
+            <p className="mt-1 text-justify">
+              Profissional com perfil analítico e visão sistêmica, capaz de unir{' '}
+              <strong>programação e análise de dados</strong>
+              para gerar insights e soluções eficazes. Forte interesse em
+              aplicar tecnologia para otimizar rotinas, reduzir erros e apoiar
+              decisões baseadas em dados.
+            </p>
           </div>
         </div>
       </section>
