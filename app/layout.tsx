@@ -6,14 +6,47 @@ import { ContactForm } from './components/cotact-form'
 import { Footer } from './components/footer'
 import { BackToTop } from './components/back-to-top'
 import { Toaster } from './components/toaster'
+import type { Metadata } from 'next'
+import {
+  SITE_DESCRIPTION,
+  SITE_HEADLINE,
+  SITE_NAME,
+  SITE_URL,
+  baseOpenGraph,
+} from './lib/site'
 
-export const metadata = {
-  metadataBase: new URL(
-    'https://devprates-htzm-8gmj05xq0-devprates-projects.vercel.app',
-  ),
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Home',
-    template: '%s | DevPrates',
+    default: `${SITE_NAME} | ${SITE_HEADLINE}`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: 'Gabriel Prates Bitencourt', url: SITE_URL }],
+  creator: 'Gabriel Prates Bitencourt',
+  keywords: [
+    'Gabriel Prates',
+    'devPrates',
+    'programador',
+    'analista de dados',
+    'desenvolvedor',
+    'portfólio',
+    'Next.js',
+    'React',
+    'Naviraí',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    ...baseOpenGraph,
+    title: `${SITE_NAME} | ${SITE_HEADLINE}`,
+    description: SITE_DESCRIPTION,
+    url: '/',
+  },
+  twitter: {
+    card: 'summary_large_image',
   },
   icons: [
     {

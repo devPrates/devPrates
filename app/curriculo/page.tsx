@@ -1,5 +1,23 @@
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 import { Link } from '../components/link'
+import { baseOpenGraph } from '../lib/site'
+import type { Metadata } from 'next'
+
+const description =
+  'Currículo de Gabriel Prates Bitencourt: objetivo profissional, experiências, formação e competências.'
+
+export const metadata: Metadata = {
+  title: 'Currículo',
+  description,
+  alternates: { canonical: '/curriculo' },
+  openGraph: {
+    ...baseOpenGraph,
+    type: 'profile',
+    title: 'Currículo | Gabriel Prates',
+    description,
+    url: '/curriculo',
+  },
+}
 
 export default async function Curriculo() {
   return (

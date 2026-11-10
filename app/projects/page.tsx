@@ -2,9 +2,22 @@ import { PageIntoduction } from '../components/pages/projects/page-introduction'
 import { ProjectsList } from '../components/pages/projects/projects-list'
 import { ProjectsPageData } from '../types/page-info'
 import { fetchHygraphQuery } from '../utils/fetch-hygraoh-query'
+import { baseOpenGraph } from '../lib/site'
+import type { Metadata } from 'next'
 
-export const metadata = {
+const description =
+  'Projetos desenvolvidos por Gabriel Prates: sistemas para empresas, cursos ministrados e aplicações web.'
+
+export const metadata: Metadata = {
   title: 'Projetos',
+  description,
+  alternates: { canonical: '/projects' },
+  openGraph: {
+    ...baseOpenGraph,
+    title: 'Projetos | Gabriel Prates',
+    description,
+    url: '/projects',
+  },
 }
 
 const getPageData = async (): Promise<ProjectsPageData> => {

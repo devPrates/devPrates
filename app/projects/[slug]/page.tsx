@@ -5,6 +5,7 @@ import { fetchHygraphQuery } from '@/app/utils/fetch-hygraoh-query'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
+import { baseOpenGraph } from '@/app/lib/site'
 
 type ProjectProps = {
   params: Promise<{
@@ -94,16 +95,23 @@ export async function generateMetadata({
   }
 
   const project = data.project
+  // Buscadores cortam a descrição por volta de 160 caracteres.
+  const description = project.shortDescription || project.description.text
 
   return {
     title: project.title,
-    description: project.description.text,
+    description,
+    alternates: { canonical: `/projects/${slug}` },
     openGraph: {
+      ...baseOpenGraph,
+      type: 'article',
+      title: `${project.title} | Gabriel Prates`,
+      description,
+      url: `/projects/${slug}`,
       images: [
         {
           url: project.thumbnail.url,
-          width: 1200,
-          height: 630,
+          alt: `Thumbnail do projeto ${project.title}`,
         },
       ],
     },
