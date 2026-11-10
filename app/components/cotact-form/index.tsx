@@ -1,6 +1,5 @@
 'use client'
 
-import { z } from 'zod'
 import { SectionTitle } from '../section-title'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,14 +8,10 @@ import { HiArrowNarrowRight } from 'react-icons/hi'
 import { motion } from 'motion/react'
 import { toast } from 'react-hot-toast'
 import { fadeUpAnimation } from '@/app/lib/animations'
-
-const contactFormSchema = z.object({
-  name: z.string().min(3).max(100),
-  email: z.email(),
-  message: z.string().min(1).max(500),
-})
-
-type ContactFormData = z.infer<typeof contactFormSchema>
+import {
+  contactSchema as contactFormSchema,
+  ContactData as ContactFormData,
+} from '@/app/lib/contact-schema'
 
 export const ContactForm = () => {
   const {

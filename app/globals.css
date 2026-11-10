@@ -8,6 +8,39 @@
   --background-image-hero-image: url('/images/background.png');
 
   --shadow-button: 0px 0px 25px 10px rgba(165, 243, 252, 0.08);
+
+  /* ---- Tema Prates (DESIGN.md + dourado do logo) ---- */
+  --color-cream: #ffedd7;
+  --color-walnut: #100904;
+  --color-bark: #382416;
+  --color-cork: #40372e;
+  --color-driftwood: #6c5f51;
+  /* Dourado original do logo: só em texto grande ou superfícies. */
+  --color-gold: #736635;
+  /* Variante clara do dourado para texto pequeno sobre o walnut. */
+  --color-gold-bright: #c9b26a;
+
+  --text-micro: 10px;
+  --text-micro--line-height: 1.2;
+  --text-label: 12px;
+  --text-label--line-height: 1.2;
+  --text-sub: 18px;
+  --text-sub--line-height: 1;
+  --text-heading-sm: 24px;
+  --text-heading-sm--line-height: 1.09;
+  --text-body-lg: 29px;
+  --text-body-lg--line-height: 1.26;
+  --text-heading: 41px;
+  --text-heading--line-height: 0.9;
+  --text-display: 51px;
+  --text-display--line-height: 0.9;
+
+  --radius-card: 12px;
+  --radius-ghost: 22.5px;
+  --radius-pill: 36px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /*
@@ -31,11 +64,27 @@
   body {
     @apply bg-gray-900 text-gray-100;
   }
+
+  /* Home nova: o body assume o canvas walnut (inclusive no overscroll). */
+  html:has([data-theme='prates']) body {
+    @apply bg-walnut text-cream;
+    font-feature-settings: 'ss01' on;
+  }
 }
 
 /* No v4 `container` é uma utility nativa; aqui ela é estendida. */
 @utility container {
   @apply mx-auto w-full max-w-[1200px] px-6;
+}
+
+/* Grade da home: largura total, só as margens laterais. */
+@utility frame {
+  @apply w-full px-5 sm:px-8 lg:px-12;
+}
+
+/* Rótulo padrão do sistema: caixa alta, peso 500. */
+@utility label {
+  @apply text-label font-medium uppercase;
 }
 
 *::-webkit-scrollbar {
@@ -50,4 +99,54 @@
 *::-webkit-scrollbar-thumb {
   background-color: #22d3ee;
   border-radius: 14px;
+}
+
+html:has([data-theme='prates']) *::-webkit-scrollbar-track {
+  background: var(--color-walnut);
+}
+
+html:has([data-theme='prates']) *::-webkit-scrollbar-thumb {
+  background-color: var(--color-gold);
+}
+
+/* Lenis (scroll suave), CSS recomendado pela biblioteca. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* SplitReveal: escondido até o JS quebrar o texto em linhas. Sem JS ou com
+   movimento reduzido, o texto aparece normalmente. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+  }
+}
+
+/* Com o medalhão 3D ativo, a versão 2D do hero sai de cena. */
+.medallion-static {
+  transition: opacity 0.8s ease;
+}
+
+html.has-3d-medallion .medallion-static {
+  opacity: 0;
+}
+
+/* Cursor customizado: some com o cursor nativo só onde o nosso existe. */
+html.has-custom-cursor [data-theme='prates'],
+html.has-custom-cursor [data-theme='prates'] a,
+html.has-custom-cursor [data-theme='prates'] button {
+  cursor: none;
 }

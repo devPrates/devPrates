@@ -1,6 +1,6 @@
 import { HiArrowNarrowLeft } from 'react-icons/hi'
-import { Link } from '../components/link'
-import { baseOpenGraph } from '../lib/site'
+import { Link } from '@/app/components/link'
+import { baseOpenGraph } from '@/app/lib/site'
 import type { Metadata } from 'next'
 
 const description =

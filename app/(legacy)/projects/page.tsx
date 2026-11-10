@@ -1,8 +1,8 @@
-import { PageIntoduction } from '../components/pages/projects/page-introduction'
-import { ProjectsList } from '../components/pages/projects/projects-list'
-import { ProjectsPageData } from '../types/page-info'
-import { fetchHygraphQuery } from '../utils/fetch-hygraoh-query'
-import { baseOpenGraph } from '../lib/site'
+import { PageIntoduction } from '@/app/components/pages/projects/page-introduction'
+import { ProjectsList } from '@/app/components/pages/projects/projects-list'
+import { ProjectsPageData } from '@/app/types/page-info'
+import { fetchHygraphQuery } from '@/app/utils/fetch-hygraoh-query'
+import { baseOpenGraph } from '@/app/lib/site'
 import type { Metadata } from 'next'
 
 const description =

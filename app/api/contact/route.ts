@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-
-// Mesmos limites do formulário; o Discord recusa campos de embed > 1024 caracteres.
-const bodySchema = z.object({
-  name: z.string().min(3).max(100),
-  email: z.email().max(254),
-  message: z.string().min(1).max(500),
-})
+import { contactSchema as bodySchema } from '@/app/lib/contact-schema'
 
 const WEBHOOK_URL = process.env.WEBHOOK_URL!
 
