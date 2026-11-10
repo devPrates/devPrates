@@ -6,14 +6,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../button'
 import { HiArrowNarrowRight } from 'react-icons/hi'
-import { motion } from 'framer-motion'
-import axios from 'axios'
+import { motion } from 'motion/react'
 import { toast } from 'react-hot-toast'
 import { fadeUpAnimation } from '@/app/lib/animations'
 
 const contactFormSchema = z.object({
   name: z.string().min(3).max(100),
-  email: z.string().email(),
+  email: z.email(),
   message: z.string().min(1).max(500),
 })
 
@@ -31,10 +30,15 @@ export const ContactForm = () => {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      await axios.post('/api/contact', data)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!response.ok) throw new Error(`Status ${response.status}`)
       toast.success('Mensagem enviada com sucesso!')
       reset()
-    } catch (error) {
+    } catch {
       toast.error('Ocorreu um erro ao enviar a mensagem. Tente novamente.')
     }
   }
@@ -57,24 +61,24 @@ export const ContactForm = () => {
         >
           <input
             placeholder="Nome"
-            className="w-full h-14 bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-none focus:ring-2 ring-emerald-600"
+            className="w-full h-14 bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-hidden focus:ring-2 ring-emerald-600"
             {...register('name')}
           />
           <input
             placeholder="E-mail"
             type="email"
-            className="w-full h-14 bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-none focus:ring-2 ring-emerald-600"
+            className="w-full h-14 bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-hidden focus:ring-2 ring-emerald-600"
             {...register('email')}
           />
           <textarea
             placeholder="Mensagem"
-            className="resize-none w-full h-[138px] bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-none focus:ring-2 ring-emerald-600"
+            className="resize-none w-full h-[138px] bg-gray-800 rounded-lg placeholder:text-gray-400 text-gray-50 p-4 focus:outline-hidden focus:ring-2 ring-emerald-600"
             {...register('message')}
             maxLength={500}
           />
 
           <div className="relative w-max mx-auto mt-6">
-            <Button className="z-[2] relative" disabled={isSubmitting}>
+            <Button className="z-2 relative" disabled={isSubmitting}>
               Enviar mensagem
               <HiArrowNarrowRight size={18} />
             </Button>

@@ -9,7 +9,7 @@ import { Link } from '@/app/components/link'
 import { Project } from '@/app/types/projects'
 import { RichText } from '@/app/components/rich-text'
 import { fadeUpAnimation, techBadgeAnimation } from '@/app/lib/animations'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 type ProjectDatailsProps = {
   project: Project

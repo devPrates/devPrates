@@ -2,7 +2,7 @@
 
 import { TbArrowNarrowUp } from 'react-icons/tb'
 import { Button } from '../button'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 
 export const BackToTop = () => {

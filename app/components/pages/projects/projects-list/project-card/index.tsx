@@ -9,14 +9,14 @@ export const ProjectsCard = ({ project }: ProjectCardProps) => {
   const technologies = project.technologies.map((x) => x.name).join(', ')
   return (
     <div className="rounded-lg h-[436px] flex flex-col bg-gray-800 overflow-hidden border-2 border-gray-800 hover:border-cyan-500 opacity-70 hover:opacity-100 transition-all group">
-      <div className="w-full h-48 overflow-hidden">
+      <div className="relative w-full h-48 overflow-hidden">
         <Image
-          width={380}
-          height={200}
+          fill
+          sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
           src={project.thumbnail.url}
           alt={`Thumbnail do projeto ${project.title}`}
           unoptimized
-          className="w-full h-full object-cover group-hover:scale-110 duration-500 transition-all"
+          className="object-cover group-hover:scale-110 duration-500 transition-all"
         />
       </div>
 

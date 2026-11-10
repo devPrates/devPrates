@@ -4,7 +4,7 @@ import { Link } from '@/app/components/link'
 import { TechBadge } from '@/app/components/tech-badge'
 import { fadeUpAnimation, techBadgeAnimation } from '@/app/lib/animations'
 import { Project } from '@/app/types/projects'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import Image from 'next/image'
 import { HiArrowNarrowRight } from 'react-icons/hi'
 
@@ -22,18 +22,18 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="w-full h-[200px] sm:h-[300px] lg:w-[420px] lg:min-h-full"
+        className="relative w-full h-[200px] sm:h-[300px] lg:w-[420px] lg:min-h-full"
         initial={{ opacity: 0, y: 100, scale: 0.5 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 100, scale: 0.5 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <Image
-          width={420}
-          height={304}
+          fill
+          sizes="(min-width: 1024px) 420px, 100vw"
           src={project.thumbnail.url}
           alt={`Thumbnail do projeto ${project.title}`}
-          className="w-full h-full object-cover rounded-lg"
+          className="object-cover rounded-lg"
         />
       </motion.div>
 

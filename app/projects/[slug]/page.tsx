@@ -4,17 +4,19 @@ import { ProjectPageData, ProjectsPageStaticData } from '@/app/types/page-info'
 import { fetchHygraphQuery } from '@/app/utils/fetch-hygraoh-query'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 
 type ProjectProps = {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
-const getProjectDetails = async (slug: string): Promise<ProjectPageData> => {
+// cache() evita buscar o mesmo projeto duas vezes (página + generateMetadata).
+const getProjectDetails = cache(async (slug: string): Promise<ProjectPageData> => {
   const query = `
-  query ProjectQuery() {
-    project(where: {slug: "${slug}"}) {
+  query ProjectQuery($slug: String!) {
+    project(where: { slug: $slug }) {
       pageThumbnail {
         url
       }
@@ -42,10 +44,11 @@ const getProjectDetails = async (slug: string): Promise<ProjectPageData> => {
     }
   }
   `
-  return fetchHygraphQuery(query, 60 * 60 * 24)
-}
+  return fetchHygraphQuery(query, 60 * 60 * 24, { slug })
+})
 
-export default async function Project({ params: { slug } }: ProjectProps) {
+export default async function Project({ params }: ProjectProps) {
+  const { slug } = await params
   const data = await getProjectDetails(slug)
 
   // Se o data ou projeto não existe, retorna 404
@@ -65,7 +68,7 @@ export default async function Project({ params: { slug } }: ProjectProps) {
 
 export async function generateStaticParams() {
   const query = `
-    query ProjectsSlugsQuery() {
+    query ProjectsSlugsQuery {
       projects(first: 100) {
         slug
       }
@@ -77,8 +80,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({
-  params: { slug },
+  params,
 }: ProjectProps): Promise<Metadata> {
+  const { slug } = await params
   const data = await getProjectDetails(slug)
 
   // Se o data ou projeto não existe, retorna metadata padrão

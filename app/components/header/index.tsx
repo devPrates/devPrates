@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { NavItem } from './nav-item'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 const NAV_ITENS = [
   {
@@ -28,7 +28,7 @@ export const Header = () => {
         <Link href={'/'}>
           <Image
             width={80}
-            height={80}
+            height={70}
             src="/images/logo.svg"
             alt="Logo devPrates"
           />

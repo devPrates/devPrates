@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ProjectsCard } from './project-card'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Project } from '@/app/types/projects'
 import { fadeUpAnimation } from '@/app/lib/animations'
 

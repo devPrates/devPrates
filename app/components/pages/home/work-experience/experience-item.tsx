@@ -4,8 +4,8 @@ import { RichText } from '@/app/components/rich-text'
 import { TechBadge } from '@/app/components/tech-badge'
 import { WorkExperience } from '@/app/types/work-experience'
 import { differenceInMonths, differenceInYears, format } from 'date-fns'
-import { motion } from 'framer-motion'
-import ptBR from 'date-fns/locale/pt-BR'
+import { motion } from 'motion/react'
+import { ptBR } from 'date-fns/locale'
 import Image from 'next/image'
 import { fadeUpAnimation, techBadgeAnimation } from '@/app/lib/animations'
 
@@ -47,7 +47,7 @@ export const ExperienceItem = ({ experience }: ExperienceItemProps) => {
       : `${months} mes${months > 1 ? 'es' : ''}`
   return (
     <motion.div
-      className="grid grid-cols-[40px,1fr] gap-4 md:gap-10"
+      className="grid grid-cols-[40px_1fr] gap-4 md:gap-10"
       {...fadeUpAnimation}
       transition={{ duration: 0.5 }}
     >
@@ -62,7 +62,7 @@ export const ExperienceItem = ({ experience }: ExperienceItemProps) => {
           />
         </div>
 
-        <div className="h-full w-[1px] bg-gray-800"></div>
+        <div className="h-full w-px bg-gray-800"></div>
       </div>
 
       <div>

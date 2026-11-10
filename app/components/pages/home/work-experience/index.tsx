@@ -11,7 +11,7 @@ import { FcViewDetails } from 'react-icons/fc'
 import { MdDownloading } from 'react-icons/md'
 import { Link } from '@/app/components/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 type WorkExperienceProps = {
   experiences: IWorkExperience[]

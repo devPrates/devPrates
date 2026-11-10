@@ -1,15 +1,41 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
+@theme {
+  --font-*: initial;
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+
+  --background-image-hero-image: url('/images/background.png');
+
+  --shadow-button: 0px 0px 25px 10px rgba(165, 243, 252, 0.08);
+}
+
+/*
+  Compatibilidade com o Tailwind 3: no v4 a cor padrão da borda virou
+  `currentcolor` e botões deixaram de ter `cursor: pointer`.
+*/
 @layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
   body {
-    @apply bg-gray-900 text-gray-100
+    @apply bg-gray-900 text-gray-100;
   }
 }
 
-.container {
-  @apply mx-auto w-full max-w-[1200px] px-6
+/* No v4 `container` é uma utility nativa; aqui ela é estendida. */
+@utility container {
+  @apply mx-auto w-full max-w-[1200px] px-6;
 }
 
 *::-webkit-scrollbar {
@@ -22,6 +48,6 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #22D3EE;
+  background-color: #22d3ee;
   border-radius: 14px;
 }
