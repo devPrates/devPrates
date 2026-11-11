@@ -2,7 +2,7 @@ import { homeContent } from '../../_content/home-content'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
-// Seção "void": título à esquerda, medalhão ao centro (vem do canvas 3D),
+// Seção "void": título à esquerda, engrenagem ao centro (vem do canvas 3D),
 // texto corrido à direita. O padrão de três colunas do DESIGN.md.
 export function Manifesto() {
   const { manifesto } = homeContent
@@ -25,8 +25,12 @@ export function Manifesto() {
         </SplitReveal>
       </div>
 
-      {/* espaço do medalhão */}
-      <div aria-hidden className="hidden aspect-square lg:block" />
+      {/* espaço da engrenagem de partículas (vem do canvas) */}
+      <div
+        aria-hidden
+        data-particles-anchor="manifesto"
+        className="hidden aspect-square lg:block"
+      />
 
       <SplitReveal
         as="p"

@@ -76,6 +76,8 @@ function Field({ count }: { count: number }) {
   const state = useRef({
     p: 0,
     spin: 0,
+    roll: 0,
+    lastScroll: -1,
     pair: '',
     mouse: new THREE.Vector2(99, 99),
     tilt: new THREE.Vector2(),
@@ -155,7 +157,7 @@ function Field({ count }: { count: number }) {
     const base: ScenePose = (portrait ? PORTRAIT_POSES : SCENE_POSES)[key]
     // O objeto é reaproveitado entre frames: campos opcionais precisam ser
     // zerados, senão uma pose herda o giro/âncora da anterior.
-    Object.assign(out, { spin: 0, anchor: undefined }, base)
+    Object.assign(out, { spin: 0, roll: 0, anchor: undefined }, base)
     out.anchorEl = null
     if (base.anchor) {
       let el = anchors.current[base.anchor]
@@ -164,8 +166,16 @@ function Field({ count }: { count: number }) {
         anchors.current[base.anchor] = el
       }
       out.anchorEl = el
-      if (el) {
-        const r = el.getBoundingClientRect()
+      const r = el?.getBoundingClientRect()
+      // Âncora escondida (largura 0, ex.: coluna que some no celular): fica a
+      // pose base, centralizada e apagada atrás do texto.
+      if (r && r.width === 0) {
+        out.anchorEl = null
+        out.x = 0
+        out.y = 0
+        out.size = Math.min(out.size, 0.5)
+        out.opacity *= 0.45
+      } else if (r) {
         const vw = window.innerWidth
         const vh = window.innerHeight
         out.x = (r.left + r.width / 2) / vw - 0.5
@@ -308,6 +318,20 @@ function Field({ count }: { count: number }) {
     if (Math.abs(spinSpeed) > 0.005) s.spin += spinSpeed * dt
     else easing.damp(s, 'spin', Math.round(s.spin / TAU) * TAU, 0.5, dt)
     i.rotation.y = s.spin
+
+    // Giro no próprio eixo (z), para a engrenagem: velocidade fixa da pose
+    // mais o scroll, como se rolar a página empurrasse os dentes.
+    const rollSpeed = lerp(a.roll ?? 0, b.roll ?? 0, k)
+    const scrollNow = window.scrollY
+    const scrollDelta = s.lastScroll < 0 ? 0 : scrollNow - s.lastScroll
+    s.lastScroll = scrollNow
+    if (Math.abs(rollSpeed) > 0.005) {
+      const weight = rollSpeed / Math.max(a.roll ?? 0, b.roll ?? 0, 0.001)
+      s.roll += rollSpeed * dt + scrollDelta * 0.002 * weight
+    } else {
+      easing.damp(s, 'roll', Math.round(s.roll / TAU) * TAU, 0.5, dt)
+    }
+    i.rotation.z = s.roll
 
     // Mouse em coordenadas do mundo (plano z = 0).
     easing.damp2(

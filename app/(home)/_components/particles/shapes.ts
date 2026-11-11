@@ -6,6 +6,7 @@ import { WORDMARK_LETTERS, WORDMARK_VIEWBOX } from '../brand/wordmark-paths'
 export type ShapeName =
   | 'wordmark'
   | 'wave'
+  | 'gear'
   | 'sphere'
   | 'bars'
   | 'tunnel'
@@ -73,6 +74,84 @@ function wave(count: number, rand: () => number) {
     out[i * 3 + 2] = z
   }
   return out
+}
+
+// Engrenagem: coroa dentada, cubo e 6 raios, com um pouco de espessura.
+// Raio total 1, para encaixar na coluna do meio da seção Sobre.
+function gear(count: number, rand: () => number) {
+  const out = new Float32Array(count * 3)
+  const teeth = 12
+  const inner = 0.58
+  // Raio externo no ângulo a: base 0.8, dente até 1 (flanco trapezoidal).
+  const outerAt = (a: number) => {
+    const t = ((a / (Math.PI * 2)) * teeth) % 1
+    const tooth = toothProfile(t)
+    return 0.8 + 0.2 * tooth
+  }
+  const depth = 0.07
+  const z = () => {
+    const face = rand()
+    // Mais pontos nas faces da frente e de trás.
+    if (face < 0.4) return depth
+    if (face < 0.8) return -depth
+    return (rand() * 2 - 1) * depth
+  }
+  for (let i = 0; i < count; i++) {
+    const pick = rand()
+    let x: number
+    let y: number
+    if (pick < 0.55) {
+      // coroa, mais densa perto das bordas
+      const a = rand() * Math.PI * 2
+      const outer = outerAt(a)
+      const u = rand()
+      const t = u < 0.5 ? Math.pow(u * 2, 3) / 2 : 1 - Math.pow((1 - u) * 2, 3) / 2
+      const r = inner + (outer - inner) * t
+      x = Math.cos(a) * r
+      y = Math.sin(a) * r
+    } else if (pick < 0.65) {
+      // contorno externo (recorte dos dentes), inclusive os flancos
+      const a = rand() * Math.PI * 2
+      const r = outerAt(a) - rand() * 0.015
+      x = Math.cos(a) * r
+      y = Math.sin(a) * r
+      if (rand() < 0.5) {
+        // flanco: liga a base ao topo do dente
+        const step = (Math.PI * 2) / teeth
+        const j = Math.floor(rand() * teeth)
+        const fa = (j + (rand() < 0.5 ? 0.05 : 0.5)) * step
+        const fr = 0.8 + rand() * 0.2
+        x = Math.cos(fa) * fr
+        y = Math.sin(fa) * fr
+      }
+    } else if (pick < 0.8) {
+      // cubo
+      const a = rand() * Math.PI * 2
+      const r = 0.16 + rand() * 0.12
+      x = Math.cos(a) * r
+      y = Math.sin(a) * r
+    } else {
+      // raios
+      const spoke = Math.floor(rand() * 6)
+      const a = (spoke / 6) * Math.PI * 2 + Math.PI / 12
+      const along = 0.28 + rand() * (inner - 0.28)
+      const across = (rand() - 0.5) * 0.09
+      x = Math.cos(a) * along - Math.sin(a) * across
+      y = Math.sin(a) * along + Math.cos(a) * across
+    }
+    out[i * 3] = x
+    out[i * 3 + 1] = y
+    out[i * 3 + 2] = z()
+  }
+  return out
+}
+
+// Onda quadrada suave para os dentes: sobe, fica no topo, desce, fica na base.
+function toothProfile(t: number) {
+  if (t < 0.1) return t / 0.1
+  if (t < 0.45) return 1
+  if (t < 0.55) return 1 - (t - 0.45) / 0.1
+  return 0
 }
 
 // Esfera (fibonacci) com uma casca de poeira por fora.
@@ -201,7 +280,7 @@ function ring(count: number, rand: () => number) {
 const GENERATORS: Record<
   ShapeName,
   (count: number, rand: () => number) => Float32Array
-> = { wordmark, wave, sphere, bars, tunnel, helix, scatter, ring }
+> = { wordmark, wave, gear, sphere, bars, tunnel, helix, scatter, ring }
 
 export function buildShapes(count: number) {
   const shapes = {} as Record<ShapeName, Float32Array>

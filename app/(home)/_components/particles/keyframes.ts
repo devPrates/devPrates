@@ -16,6 +16,8 @@ export type ScenePose = {
   rot: [number, number, number]
   opacity: number
   spin?: number
+  // Giro no eixo z (de frente para a tela), em rad/s.
+  roll?: number
   anchor?: string
   // Preenchido em tempo de execução: o elemento da âncora, se existir.
   anchorEl?: HTMLElement | null
@@ -32,13 +34,15 @@ export const SCENE_POSES = {
     anchor: '[data-particles-anchor="hero"]',
   },
   manifesto: {
-    shape: 'wave',
+    // Engrenagem encaixada na coluna do meio, entre os dois textos.
+    shape: 'gear',
     x: 0,
-    y: -0.12,
-    size: 0.95,
-    rot: [0.75, 0.3, 0],
-    opacity: 0.55,
-    spin: 0.05,
+    y: 0,
+    size: 0.42,
+    rot: [0, 0, 0],
+    opacity: 0.95,
+    roll: 0.3,
+    anchor: '[data-particles-anchor="manifesto"]',
   },
   services: {
     shape: 'sphere',
