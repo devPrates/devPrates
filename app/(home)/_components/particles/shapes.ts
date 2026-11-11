@@ -8,7 +8,7 @@ export type ShapeName =
   | 'wave'
   | 'gear'
   | 'sphere'
-  | 'bars'
+  | 'clipboard'
   | 'tunnel'
   | 'helix'
   | 'scatter'
@@ -26,40 +26,223 @@ function random(seed: number) {
   }
 }
 
-// PRATES preenchido: desenha as letras num canvas e sorteia pixels pintados.
-// Largura final = 2 (x de -1 a 1), proporção do SVG original.
-function wordmark(count: number, rand: () => number) {
+// Desenha uma cena num canvas e sorteia pontos nos pixels pintados. Cada
+// camada é pintada com o canal vermelho = id * 36 (use `tone(id)`), recebe
+// uma fatia dos pontos (`share`) e uma profundidade própria (`z`). As
+// coordenadas saem normalizadas pelo lado maior, que vai de -1 a 1.
+type Layer = { share: number; z: () => number }
+const tone = (id: number) => `rgb(${id * 36},0,0)`
+
+function sampleCanvas(
+  count: number,
+  rand: () => number,
+  w: number,
+  h: number,
+  layers: Record<number, Layer>,
+  draw: (ctx: CanvasRenderingContext2D) => void,
+) {
   const out = new Float32Array(count * 3)
-  const scale = 2
-  const w = Math.ceil(WORDMARK_VIEWBOX.width * scale)
-  const h = Math.ceil(WORDMARK_VIEWBOX.height * scale)
   const canvas = document.createElement('canvas')
   canvas.width = w
   canvas.height = h
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
   if (!ctx) return scatter(count, rand)
-
-  ctx.scale(scale, scale)
-  ctx.fillStyle = '#fff'
-  for (const letter of WORDMARK_LETTERS) {
-    ctx.fill(new Path2D(letter.d), 'evenodd')
-  }
+  draw(ctx)
 
   const data = ctx.getImageData(0, 0, w, h).data
-  const filled: number[] = []
-  for (let i = 0; i < w * h; i++) if (data[i * 4 + 3] > 128) filled.push(i)
-  if (filled.length === 0) return scatter(count, rand)
+  const pixels: Record<number, number[]> = {}
+  for (const id of Object.keys(layers)) pixels[Number(id)] = []
+  for (let i = 0; i < w * h; i++) {
+    if (data[i * 4 + 3] < 128) continue
+    pixels[Math.round(data[i * 4] / 36)]?.push(i)
+  }
+  const ids = Object.keys(layers)
+    .map(Number)
+    .filter((id) => pixels[id].length > 0)
+  if (ids.length === 0) return scatter(count, rand)
+  const total = ids.reduce((sum, id) => sum + layers[id].share, 0)
 
-  const half = w / 2
-  for (let i = 0; i < count; i++) {
-    const pixel = filled[Math.floor(rand() * filled.length)]
-    const px = (pixel % w) + rand()
-    const py = Math.floor(pixel / w) + rand()
-    out[i * 3] = (px - half) / half
-    out[i * 3 + 1] = (h / 2 - py) / half
-    out[i * 3 + 2] = (rand() - 0.5) * 0.05
+  const half = Math.max(w, h) / 2
+  let i = 0
+  ids.forEach((id, k) => {
+    const end =
+      k === ids.length - 1
+        ? count
+        : Math.min(count, i + Math.round((layers[id].share / total) * count))
+    const list = pixels[id]
+    for (; i < end; i++) {
+      const pixel = list[Math.floor(rand() * list.length)]
+      const px = (pixel % w) + rand()
+      const py = Math.floor(pixel / w) + rand()
+      out[i * 3] = (px - w / 2) / half
+      out[i * 3 + 1] = (h / 2 - py) / half
+      out[i * 3 + 2] = layers[id].z()
+    }
+  })
+  // Embaralha a ordem para o morph não andar em blocos por camada.
+  for (let j = count - 1; j > 0; j--) {
+    const r = Math.floor(rand() * (j + 1))
+    for (let c = 0; c < 3; c++) {
+      const t = out[j * 3 + c]
+      out[j * 3 + c] = out[r * 3 + c]
+      out[r * 3 + c] = t
+    }
   }
   return out
+}
+
+// PRATES preenchido, na proporção do SVG original (largura de -1 a 1).
+function wordmark(count: number, rand: () => number) {
+  const scale = 2
+  const w = Math.ceil(WORDMARK_VIEWBOX.width * scale)
+  const h = Math.ceil(WORDMARK_VIEWBOX.height * scale)
+  return sampleCanvas(
+    count,
+    rand,
+    w,
+    h,
+    { 1: { share: 1, z: () => (rand() - 0.5) * 0.05 } },
+    (ctx) => {
+      ctx.scale(scale, scale)
+      ctx.fillStyle = tone(1)
+      for (const letter of WORDMARK_LETTERS) {
+        ctx.fill(new Path2D(letter.d), 'evenodd')
+      }
+    },
+  )
+}
+
+// Prancheta com uma ficha preenchida: tábua, prendedor, folha com orelha,
+// foto 3x4, campos, linhas de rótulo + valor, caixinhas marcadas e
+// assinatura. Não é texto legível, mas a estrutura lê como formulário.
+function clipboard(count: number, rand: () => number) {
+  const BOARD = 1
+  const BOARD_EDGE = 2
+  const PAPER = 3
+  const PAPER_EDGE = 4
+  const INK = 5
+  const CLIP = 6
+  const jitter = (base: number, spread: number) => () =>
+    base + (rand() - 0.5) * spread
+  return sampleCanvas(
+    count,
+    rand,
+    600,
+    800,
+    {
+      [BOARD]: { share: 0.05, z: jitter(-0.05, 0.01) },
+      [BOARD_EDGE]: { share: 0.13, z: jitter(-0.035, 0.03) },
+      [PAPER]: { share: 0.07, z: jitter(0, 0.006) },
+      [PAPER_EDGE]: { share: 0.08, z: jitter(0, 0.006) },
+      [INK]: { share: 0.55, z: jitter(0.01, 0.006) },
+      [CLIP]: { share: 0.12, z: jitter(0.06, 0.04) },
+    },
+    (ctx) => {
+      const fill = (id: number, path: () => void, rule?: CanvasFillRule) => {
+        ctx.fillStyle = tone(id)
+        ctx.beginPath()
+        path()
+        ctx.fill(rule)
+      }
+      const stroke = (id: number, width: number, path: () => void) => {
+        ctx.strokeStyle = tone(id)
+        ctx.lineWidth = width
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        path()
+        ctx.stroke()
+      }
+      const bar = (x: number, y: number, bw: number, bh: number) =>
+        fill(INK, () => ctx.rect(x, y, bw, bh))
+
+      // Tábua
+      fill(BOARD, () => ctx.roundRect(70, 80, 460, 700, 28))
+      stroke(BOARD_EDGE, 14, () => ctx.roundRect(70, 80, 460, 700, 28))
+
+      // Folha com a ponta de baixo dobrada
+      const sheet = () => {
+        ctx.moveTo(105, 130)
+        ctx.lineTo(495, 130)
+        ctx.lineTo(495, 700)
+        ctx.lineTo(445, 750)
+        ctx.lineTo(105, 750)
+        ctx.closePath()
+      }
+      fill(PAPER, sheet)
+      stroke(PAPER_EDGE, 5, sheet)
+      stroke(PAPER_EDGE, 4, () => {
+        ctx.moveTo(495, 700)
+        ctx.lineTo(445, 700)
+        ctx.lineTo(445, 750)
+      })
+
+      // Cabeçalho
+      bar(135, 185, 200, 22)
+      bar(135, 220, 130, 8)
+
+      // Foto 3x4 com silhueta de busto
+      stroke(INK, 4, () => ctx.rect(135, 250, 95, 120))
+      fill(INK, () => ctx.arc(182, 293, 20, 0, Math.PI * 2))
+      fill(INK, () => ctx.arc(182, 368, 38, Math.PI, Math.PI * 2))
+
+      // Campos ao lado da foto
+      for (let k = 0; k < 3; k++) {
+        const y = 266 + k * 36
+        bar(255, y, 52, 7)
+        bar(255, y + 16, 210, 3)
+      }
+
+      // Linhas de rótulo + valor, separadas por tracejado
+      const values = [210, 165, 230, 185, 150]
+      values.forEach((vw, k) => {
+        const y = 404 + k * 44
+        bar(135, y, 70, 8)
+        bar(225, y, vw, 8)
+        ctx.setLineDash([10, 8])
+        stroke(INK, 2, () => {
+          ctx.moveTo(135, y + 25)
+          ctx.lineTo(465, y + 25)
+        })
+        ctx.setLineDash([])
+      })
+
+      // Caixinhas, duas marcadas
+      ;[135, 225, 315].forEach((x, k) => {
+        const y = 630
+        stroke(INK, 3, () => ctx.rect(x, y, 20, 20))
+        bar(x + 30, y + 7, 42, 6)
+        if (k < 2) {
+          stroke(INK, 5, () => {
+            ctx.moveTo(x + 3, y + 10)
+            ctx.lineTo(x + 9, y + 17)
+            ctx.lineTo(x + 22, y - 2)
+          })
+        }
+      })
+
+      // Assinatura
+      stroke(INK, 3, () => {
+        ctx.moveTo(300, 705)
+        ctx.bezierCurveTo(318, 670, 330, 670, 326, 700)
+        ctx.bezierCurveTo(322, 722, 344, 690, 360, 688)
+        ctx.bezierCurveTo(380, 686, 372, 708, 392, 700)
+        ctx.bezierCurveTo(410, 692, 420, 684, 452, 690)
+      })
+      bar(295, 716, 170, 2)
+
+      // Prendedor: base arredondada e alça com furo
+      fill(CLIP, () => ctx.roundRect(205, 95, 190, 70, 14))
+      fill(
+        CLIP,
+        () => {
+          ctx.roundRect(245, 40, 110, 80, 30)
+          ctx.roundRect(272, 60, 56, 30, 14)
+        },
+        'evenodd',
+      )
+    },
+  )
 }
 
 // Superfície ondulada, como um tecido.
@@ -170,44 +353,6 @@ function sphere(count: number, rand: () => number) {
   return out
 }
 
-// Gráfico de barras 3D: colunas numa grade, alturas em onda. Os pontos
-// ficam nas arestas e no topo de cada coluna, para a forma ler como gráfico.
-function bars(count: number, rand: () => number) {
-  const out = new Float32Array(count * 3)
-  const cols = 7
-  const rows = 4
-  const gap = 2 / cols
-  const half = gap * 0.32
-  for (let i = 0; i < count; i++) {
-    const c = Math.floor(rand() * cols)
-    const r = Math.floor(rand() * rows)
-    const height =
-      0.3 + (Math.sin(c * 0.9 + r * 1.3) * 0.5 + 0.5) * (0.5 + c * 0.14)
-    const cx = -1 + gap / 2 + c * gap
-    const cz = (r - rows / 2 + 0.5) * gap
-    let x: number
-    let y: number
-    let z: number
-    if (rand() < 0.55) {
-      // aresta vertical
-      x = cx + (rand() < 0.5 ? -half : half)
-      z = cz + (rand() < 0.5 ? -half : half)
-      y = rand() * height
-    } else {
-      // contorno do topo e da base
-      const t = rand() * 2 - 1
-      const side = Math.floor(rand() * 4)
-      x = cx + (side < 2 ? t * half : side === 2 ? -half : half)
-      z = cz + (side < 2 ? (side === 0 ? -half : half) : t * half)
-      y = rand() < 0.75 ? height : 0
-    }
-    out[i * 3] = x + (rand() - 0.5) * 0.01
-    out[i * 3 + 1] = y - 0.9
-    out[i * 3 + 2] = z + (rand() - 0.5) * 0.01
-  }
-  return out
-}
-
 // Túnel: anéis ao longo do eixo z, para ficar ao fundo da galeria.
 function tunnel(count: number, rand: () => number) {
   const out = new Float32Array(count * 3)
@@ -280,7 +425,7 @@ function ring(count: number, rand: () => number) {
 const GENERATORS: Record<
   ShapeName,
   (count: number, rand: () => number) => Float32Array
-> = { wordmark, wave, gear, sphere, bars, tunnel, helix, scatter, ring }
+> = { wordmark, wave, gear, sphere, clipboard, tunnel, helix, scatter, ring }
 
 export function buildShapes(count: number) {
   const shapes = {} as Record<ShapeName, Float32Array>

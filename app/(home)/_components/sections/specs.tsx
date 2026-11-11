@@ -4,8 +4,8 @@ import { DashLine } from '../motion/dash-line'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
-// Ficha técnica no formato de especificação de produto. O medalhão fica à
-// esquerda (visto quase de cima); o conteúdo ocupa a metade direita.
+// Ficha técnica no formato de especificação de produto. As partículas viram
+// uma prancheta com a ficha à esquerda; o conteúdo ocupa a metade direita.
 export function Specs() {
   const { specs } = homeContent
 

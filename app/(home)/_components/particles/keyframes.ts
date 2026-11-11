@@ -54,13 +54,14 @@ export const SCENE_POSES = {
     spin: 0.18,
   },
   specs: {
-    shape: 'bars',
+    // Prancheta com a ficha, levemente inclinada. Sem giro: de costas a
+    // ficha apareceria espelhada.
+    shape: 'clipboard',
     x: -0.25,
     y: 0,
-    size: 0.6,
-    rot: [0.45, 0.6, 0],
-    opacity: 0.9,
-    spin: 0.08,
+    size: 0.78,
+    rot: [-0.12, 0.32, 0.06],
+    opacity: 0.95,
   },
   projects: {
     shape: 'tunnel',
