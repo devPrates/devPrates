@@ -55,6 +55,7 @@ function makeMaterial(size: number) {
       uScroll: { value: 0 },
       uWrap: { value: 0 },
       uOpacity: { value: 1 },
+      uSolid: { value: 0 },
       uColorA: { value: new THREE.Color('#736635') },
       uColorB: { value: new THREE.Color('#d9bf74') },
       uColorC: { value: new THREE.Color('#ffedd7') },
@@ -79,6 +80,12 @@ function Field({ count }: { count: number }) {
     mouse: new THREE.Vector2(99, 99),
     tilt: new THREE.Vector2(),
     startedAt: -1,
+    // Fechamento no rodapé: tint = partículas ficando creme; fade = elas
+    // sumindo enquanto o PRATES sólido aparece; settledAt = desde quando
+    // estão paradas em cima dele.
+    tint: 0,
+    fade: 0,
+    settledAt: -1,
   })
 
   const shapes = useMemo(() => buildShapes(count), [count])
@@ -247,7 +254,29 @@ function Field({ count }: { count: number }) {
     u.uTime.value = time
     u.uIntro.value = Math.min(1, (time - s.startedAt) / 2.4)
     u.uPixelRatio.value = gl.getPixelRatio()
-    u.uOpacity.value = lerp(a.opacity, b.opacity, k)
+    // Fechamento: quanto da cena atual é o PRATES do rodapé.
+    const isFooter = (pose: ScenePose) => pose.anchor?.includes('footer')
+    const wf = (isFooter(a) ? 1 - k : 0) + (isFooter(b) ? k : 0)
+    const footerEl = isFooter(b) ? b.anchorEl : isFooter(a) ? a.anchorEl : null
+    easing.damp(s, 'tint', THREE.MathUtils.smoothstep(wf, 0.55, 1), 0.3, dt)
+    const settled = wf > 0.97 && Math.abs(target - s.p) < 0.02
+    if (settled && s.settledAt < 0) s.settledAt = time
+    if (!settled) s.settledAt = -1
+    // Montou e ficou parado meio segundo: vira o PRATES sólido.
+    const solid = s.settledAt >= 0 && time - s.settledAt > 0.5
+    easing.damp(s, 'fade', solid ? 1 : 0, solid ? 0.45 : 0.2, dt)
+    if (footerEl) {
+      const isSolid = footerEl.hasAttribute('data-particles-solid')
+      if (solid && !isSolid) footerEl.setAttribute('data-particles-solid', '')
+      else if (!solid && isSolid && wf < 0.9)
+        footerEl.removeAttribute('data-particles-solid')
+    } else {
+      document
+        .querySelector('[data-particles-solid]')
+        ?.removeAttribute('data-particles-solid')
+    }
+    u.uSolid.value = s.tint
+    u.uOpacity.value = lerp(a.opacity, b.opacity, k) * (1 - s.fade)
     // Partículas maiores em telas pequenas, para não sumirem.
     u.uSize.value = canvasWidth < 700 ? 22 : 18
 

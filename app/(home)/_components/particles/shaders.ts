@@ -127,6 +127,7 @@ uniform vec3 uColorA;
 uniform vec3 uColorB;
 uniform vec3 uColorC;
 uniform float uOpacity;
+uniform float uSolid;
 
 varying float vAlpha;
 varying float vTone;
@@ -142,6 +143,8 @@ void main() {
   vec3 color = mix(uColorA, uColorB, smoothstep(0.0, 0.85, vTone));
   color = mix(color, uColorC, step(0.92, vTone) * 0.8 + vGlow * 0.5);
 
+  // No fim da página as partículas clareiam até o creme do PRATES sólido.
+  color = mix(color, uColorC, uSolid);
   gl_FragColor = vec4(color, a * vAlpha * uOpacity);
   #include <colorspace_fragment>
 }

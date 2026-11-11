@@ -145,12 +145,13 @@ html.has-3d-scene [data-particles-anchor='hero'] {
   opacity: 0;
 }
 
-/* No rodapé o PRATES sólido só some quando as partículas chegam nele. */
+/* No rodapé é o caminho inverso do hero: as partículas montam o PRATES,
+   ficam creme e só então a marca sólida aparece por cima. */
 [data-particles-anchor='footer'] {
-  transition: opacity 0.9s ease;
+  transition: opacity 0.8s ease;
 }
 
-html.has-3d-scene [data-particles-anchor='footer'][data-particles-on] {
+html.has-3d-scene [data-particles-anchor='footer']:not([data-particles-solid]) {
   opacity: 0;
 }
 
