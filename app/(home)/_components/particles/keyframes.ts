@@ -80,32 +80,23 @@ export const SCENE_POSES = {
     opacity: 0.85,
     spin: 0.35,
   },
-  testimonials: {
-    shape: 'scatter',
-    x: 0,
+  process: {
+    // Trilha com as 4 etapas, à direita da lista.
+    shape: 'trail',
+    x: 0.25,
     y: 0,
-    size: 0.95,
-    rot: [0, 0, 0],
-    opacity: 0.35,
-    spin: 0.04,
-  },
-  comparison: {
-    shape: 'scatter',
-    x: 0,
-    y: 0,
-    size: 1.1,
-    rot: [0.4, 0, 0],
-    opacity: 0.3,
-    spin: -0.04,
+    size: 0.78,
+    rot: [-0.1, -0.3, 0],
+    opacity: 0.95,
   },
   contact: {
-    shape: 'scatter',
-    x: 0,
+    // Pessoa no telefone de disco, à direita do texto e dos botões.
+    shape: 'phone',
+    x: 0.22,
     y: 0,
-    size: 1,
-    rot: [0, 0, 0],
-    opacity: 0.3,
-    spin: 0.04,
+    size: 0.76,
+    rot: [-0.06, -0.28, 0],
+    opacity: 0.95,
   },
   // Fim da página: as partículas voltam a ser o PRATES, agora o do rodapé.
   footer: {

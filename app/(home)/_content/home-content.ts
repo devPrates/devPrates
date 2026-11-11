@@ -35,17 +35,10 @@ export type Experience = {
   summary: string
 }
 
-export type Testimonial = {
-  quote: string
-  author: string
-  role: string
-  rating: number
-}
-
-export type ComparisonRow = {
-  topic: string
-  without: string
-  with: string
+export type ProcessStep = {
+  index: string
+  title: string
+  body: string
 }
 
 const HYGRAPH_ASSETS = 'https://sa-east-1.graphassets.com/AYnkdiyktTw6btCR8j83nz'
@@ -192,65 +185,35 @@ export const homeContent = {
     ] satisfies Experience[],
   },
 
-  testimonials: {
-    eyebrow: '06 — Depoimentos',
-    heading: 'Quem já trabalhou comigo.',
-    items: [
+  process: {
+    eyebrow: '06 — Processo',
+    heading: 'Como eu trabalho.',
+    steps: [
       {
-        quote:
-          'Entendeu o problema antes de eu terminar de explicar. O sistema está rodando até hoje.',
-        author: 'Cliente A.',
-        role: 'Sócia, comércio local',
-        rating: 5,
+        index: '01',
+        title: 'Conversa',
+        body: 'Entendo o problema, o objetivo e quem vai usar. Sem compromisso.',
       },
       {
-        quote:
-          'Prazo cumprido e ainda sobrou tempo para ajustar o que a gente nem tinha pedido.',
-        author: 'Cliente B.',
-        role: 'Gestor, agronegócio',
-        rating: 5,
+        index: '02',
+        title: 'Proposta',
+        body: 'Escopo, prazo e valor por escrito, antes de qualquer linha de código.',
       },
       {
-        quote:
-          'Explicou cada decisão sem tecniquês. Raro encontrar dev assim.',
-        author: 'Cliente C.',
-        role: 'Coordenadora, educação',
-        rating: 5,
-      },
-    ] satisfies Testimonial[],
-  },
-
-  comparison: {
-    eyebrow: '07 — Comparativo',
-    heading: 'Sem Prates × com Prates.',
-    columns: { without: 'Sem Prates', with: 'Com Prates' },
-    rows: [
-      {
-        topic: 'Prazo',
-        without: 'Depois a gente vê',
-        with: 'Combinado e cumprido',
+        index: '03',
+        title: 'Desenvolvimento',
+        body: 'Entregas parciais para você acompanhar e ajustar no caminho.',
       },
       {
-        topic: 'Comunicação',
-        without: 'Some por semanas',
-        with: 'Atualização toda semana',
+        index: '04',
+        title: 'Entrega e suporte',
+        body: 'Publicação, treinamento e suporte depois da entrega. Sem sumiço.',
       },
-      {
-        topic: 'Código',
-        without: 'Funciona na minha máquina',
-        with: 'Testado e documentado',
-      },
-      {
-        topic: 'Depois da entrega',
-        without: 'Boa sorte',
-        with: 'Suporte incluso',
-      },
-      { topic: 'Café', without: 'Nenhum', with: 'Muito' },
-    ] satisfies ComparisonRow[],
+    ] satisfies ProcessStep[],
   },
 
   contact: {
-    eyebrow: '08 — Contato',
+    eyebrow: '07 — Contato',
     heading: 'Vamos construir algo juntos?',
     body: 'Conte o que você precisa. Eu respondo em até um dia útil com os próximos passos.',
     email: 'devprates@gmail.com',

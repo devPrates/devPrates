@@ -1,15 +1,14 @@
 import { SITE_HEADLINE, SITE_URL } from '@/app/lib/site'
 import { fetchHygraphQuery } from '@/app/utils/fetch-hygraoh-query'
 import { homeContent, ProjectHighlight } from './_content/home-content'
-import { Comparison } from './_components/sections/comparison'
 import { Contact } from './_components/sections/contact'
 import { Experience } from './_components/sections/experience'
 import { Hero } from './_components/sections/hero'
 import { Manifesto } from './_components/sections/manifesto'
+import { Process } from './_components/sections/process'
 import { Projects } from './_components/sections/projects'
 import { Services } from './_components/sections/services'
 import { Specs } from './_components/sections/specs'
-import { Testimonials } from './_components/sections/testimonials'
 
 type PersonData = {
   page: {
@@ -69,6 +68,14 @@ export default async function Home() {
       }))
     : homeContent.projects.items
 
+  // WhatsApp: o número fica só na env e vai para a página apenas no link.
+  const phone = process.env.CONTACT_PHONE?.replace(/\D/g, '')
+  const whatsappHref = phone
+    ? `https://wa.me/${phone}?text=${encodeURIComponent(
+        'Olá, Gabriel! Vim pelo seu site e quero conversar sobre um projeto.',
+      )}`
+    : undefined
+
   // Dados estruturados: ajudam o Google a associar o site à pessoa e aos perfis.
   const personJsonLd = {
     '@context': 'https://schema.org',
@@ -104,9 +111,8 @@ export default async function Home() {
       <Specs />
       <Projects items={projectItems} />
       <Experience />
-      <Testimonials />
-      <Comparison />
-      <Contact />
+      <Process />
+      <Contact whatsappHref={whatsappHref} />
     </>
   )
 }

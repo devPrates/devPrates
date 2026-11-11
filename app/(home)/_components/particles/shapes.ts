@@ -13,6 +13,8 @@ export type ShapeName =
   | 'helix'
   | 'scatter'
   | 'ring'
+  | 'trail'
+  | 'phone'
 
 // Gerador pseudoaleatório com semente: as formas saem iguais a cada visita.
 function random(seed: number) {
@@ -27,11 +29,11 @@ function random(seed: number) {
 }
 
 // Desenha uma cena num canvas e sorteia pontos nos pixels pintados. Cada
-// camada é pintada com o canal vermelho = id * 36 (use `tone(id)`), recebe
+// camada é pintada com o canal vermelho = id * 28 (use `tone(id)`), recebe
 // uma fatia dos pontos (`share`) e uma profundidade própria (`z`). As
 // coordenadas saem normalizadas pelo lado maior, que vai de -1 a 1.
 type Layer = { share: number; z: () => number }
-const tone = (id: number) => `rgb(${id * 36},0,0)`
+const tone = (id: number) => `rgb(${id * 28},0,0)`
 
 function sampleCanvas(
   count: number,
@@ -54,7 +56,7 @@ function sampleCanvas(
   for (const id of Object.keys(layers)) pixels[Number(id)] = []
   for (let i = 0; i < w * h; i++) {
     if (data[i * 4 + 3] < 128) continue
-    pixels[Math.round(data[i * 4] / 36)]?.push(i)
+    pixels[Math.round(data[i * 4] / 28)]?.push(i)
   }
   const ids = Object.keys(layers)
     .map(Number)
@@ -422,10 +424,252 @@ function ring(count: number, rand: () => number) {
   return out
 }
 
+// Pincéis para desenhar camadas no canvas do `sampleCanvas`.
+function pens(ctx: CanvasRenderingContext2D) {
+  return {
+    fill(id: number, path: () => void, rule?: CanvasFillRule) {
+      ctx.fillStyle = tone(id)
+      ctx.beginPath()
+      path()
+      ctx.fill(rule)
+    },
+    stroke(id: number, width: number, path: () => void, dash: number[] = []) {
+      ctx.strokeStyle = tone(id)
+      ctx.lineWidth = width
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.setLineDash(dash)
+      ctx.beginPath()
+      path()
+      ctx.stroke()
+      ctx.setLineDash([])
+    },
+  }
+}
+
+const jitterOf = (rand: () => number) => (base: number, spread: number) => () =>
+  base + (rand() - 0.5) * spread
+
+// Trilha do processo: caminho tracejado em S ligando 4 marcos (anel com
+// ponto no meio), com uma bandeira de chegada no último.
+function trail(count: number, rand: () => number) {
+  const PATH = 1
+  const NODE = 2
+  const HALO = 3
+  const FLAG = 4
+  const jitter = jitterOf(rand)
+  const nodes: [number, number][] = [
+    [170, 130],
+    [430, 300],
+    [170, 490],
+    [430, 690],
+  ]
+  return sampleCanvas(
+    count,
+    rand,
+    600,
+    800,
+    {
+      [PATH]: { share: 0.3, z: jitter(0, 0.02) },
+      [NODE]: { share: 0.38, z: jitter(0.03, 0.03) },
+      [HALO]: { share: 0.12, z: jitter(0.01, 0.02) },
+      [FLAG]: { share: 0.2, z: jitter(0.05, 0.03) },
+    },
+    (ctx) => {
+      const { fill, stroke } = pens(ctx)
+      stroke(
+        PATH,
+        6,
+        () => {
+          ctx.moveTo(...nodes[0])
+          ctx.bezierCurveTo(330, 130, 480, 200, 430, 300)
+          ctx.bezierCurveTo(380, 400, 150, 380, 170, 490)
+          ctx.bezierCurveTo(190, 600, 420, 580, 430, 690)
+        },
+        [18, 16],
+      )
+      nodes.forEach(([x, y]) => {
+        fill(NODE, () => ctx.arc(x, y, 40, 0, Math.PI * 2))
+      })
+      // Recorta o miolo dos marcos: anel + ponto central.
+      ctx.globalCompositeOperation = 'destination-out'
+      nodes.forEach(([x, y]) => {
+        fill(NODE, () => ctx.arc(x, y, 30, 0, Math.PI * 2))
+      })
+      ctx.globalCompositeOperation = 'source-over'
+      nodes.forEach(([x, y]) => {
+        fill(NODE, () => ctx.arc(x, y, 13, 0, Math.PI * 2))
+        stroke(HALO, 2, () => ctx.arc(x, y, 58, 0, Math.PI * 2), [6, 8])
+      })
+      // Bandeira de chegada no último marco.
+      const [fx, fy] = nodes[3]
+      stroke(FLAG, 6, () => {
+        ctx.moveTo(fx, fy - 40)
+        ctx.lineTo(fx, fy - 170)
+      })
+      fill(FLAG, () => {
+        ctx.moveTo(fx, fy - 170)
+        ctx.quadraticCurveTo(fx + 55, fy - 185, fx + 110, fy - 150)
+        ctx.quadraticCurveTo(fx + 55, fy - 135, fx, fy - 110)
+        ctx.closePath()
+      })
+    },
+  )
+}
+
+// Pessoa de frente falando num telefone de disco: o fone no ouvido, o fio
+// enrolado descendo até o aparelho, que fica na frente, com o disco furado.
+function phone(count: number, rand: () => number) {
+  const BODY = 1
+  const BODY_EDGE = 2
+  const FACE = 3
+  const HANDSET = 4
+  const CORD = 5
+  const BASE = 6
+  const BASE_EDGE = 7
+  const DIAL = 8
+  const jitter = jitterOf(rand)
+  return sampleCanvas(
+    count,
+    rand,
+    600,
+    800,
+    {
+      [BODY]: { share: 0.08, z: jitter(-0.04, 0.03) },
+      [BODY_EDGE]: { share: 0.2, z: jitter(-0.03, 0.03) },
+      [FACE]: { share: 0.06, z: jitter(0.01, 0.01) },
+      [HANDSET]: { share: 0.15, z: jitter(0.05, 0.03) },
+      [CORD]: { share: 0.07, z: jitter(0.05, 0.05) },
+      [BASE]: { share: 0.07, z: jitter(0.08, 0.02) },
+      [BASE_EDGE]: { share: 0.13, z: jitter(0.08, 0.02) },
+      [DIAL]: { share: 0.24, z: jitter(0.1, 0.01) },
+    },
+    (ctx) => {
+      const { fill, stroke } = pens(ctx)
+
+      // Tronco e ombros
+      const torso = () => {
+        ctx.moveTo(60, 640)
+        ctx.bezierCurveTo(60, 430, 140, 365, 250, 360)
+        ctx.bezierCurveTo(360, 365, 440, 430, 440, 640)
+        ctx.closePath()
+      }
+      fill(BODY, torso)
+      stroke(BODY_EDGE, 6, torso)
+      // Pescoço
+      fill(BODY, () => ctx.rect(222, 300, 56, 64))
+      // Cabeça
+      const head = () => ctx.ellipse(250, 215, 78, 95, 0, 0, Math.PI * 2)
+      fill(BODY, head)
+      stroke(BODY_EDGE, 6, head)
+      // Rosto: sobrancelhas, olhos, bigode, sorriso e cavanhaque
+      stroke(FACE, 5, () => {
+        ctx.moveTo(208, 182)
+        ctx.quadraticCurveTo(222, 174, 236, 180)
+        ctx.moveTo(268, 180)
+        ctx.quadraticCurveTo(282, 174, 296, 182)
+      })
+      fill(FACE, () => ctx.arc(222, 205, 7, 0, Math.PI * 2))
+      fill(FACE, () => ctx.arc(282, 205, 7, 0, Math.PI * 2))
+      stroke(FACE, 8, () => {
+        ctx.moveTo(226, 254)
+        ctx.quadraticCurveTo(252, 242, 278, 254)
+      })
+      stroke(FACE, 5, () => {
+        ctx.moveTo(230, 270)
+        ctx.quadraticCurveTo(252, 290, 274, 270)
+      })
+      fill(FACE, () => ctx.ellipse(252, 298, 11, 7, 0, 0, Math.PI * 2))
+
+      // Braço levantado até o fone, com a mão
+      stroke(BODY_EDGE, 44, () => {
+        ctx.moveTo(115, 470)
+        ctx.quadraticCurveTo(60, 340, 140, 280)
+      })
+      fill(BODY_EDGE, () => ctx.arc(150, 268, 30, 0, Math.PI * 2))
+
+      // Fone: alça curva do ouvido à boca, com as duas pontas
+      stroke(HANDSET, 26, () => {
+        ctx.moveTo(172, 165)
+        ctx.quadraticCurveTo(120, 245, 190, 322)
+      })
+      fill(HANDSET, () => ctx.ellipse(176, 160, 30, 22, -0.5, 0, Math.PI * 2))
+      fill(HANDSET, () => ctx.ellipse(196, 328, 30, 22, 0.6, 0, Math.PI * 2))
+
+      // Fio enrolado do fone até o aparelho
+      stroke(CORD, 3, () => {
+        const from = [205, 345]
+        const to = [350, 640]
+        const dx = to[0] - from[0]
+        const dy = to[1] - from[1]
+        const len = Math.hypot(dx, dy)
+        const nx = -dy / len
+        const ny = dx / len
+        const loops = 16
+        for (let i = 0; i <= 400; i++) {
+          const t = i / 400
+          const a = t * loops * Math.PI * 2
+          // sag: o fio pende um pouco para fora no meio
+          const sag = Math.sin(t * Math.PI) * 40
+          const x = from[0] + dx * t + nx * (Math.sin(a) * 11 + sag) + Math.cos(a) * 5
+          const y = from[1] + dy * t + ny * (Math.sin(a) * 11 + sag)
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
+        }
+      })
+
+      // Aparelho: corpo trapezoidal e o gancho vazio
+      const base = () => {
+        ctx.moveTo(300, 790)
+        ctx.lineTo(580, 790)
+        ctx.lineTo(548, 640)
+        ctx.lineTo(332, 640)
+        ctx.closePath()
+      }
+      fill(BASE, base)
+      stroke(BASE_EDGE, 6, base)
+      fill(BASE_EDGE, () => ctx.roundRect(345, 606, 34, 40, 10))
+      fill(BASE_EDGE, () => ctx.roundRect(501, 606, 34, 40, 10))
+      stroke(BASE_EDGE, 5, () => {
+        ctx.moveTo(379, 628)
+        ctx.lineTo(501, 628)
+      })
+
+      // Disco: aro, 10 furos, miolo e o batente
+      const cx = 440
+      const cy = 718
+      stroke(DIAL, 7, () => ctx.arc(cx, cy, 60, 0, Math.PI * 2))
+      for (let k = 0; k < 10; k++) {
+        const a = -Math.PI / 3 - (k / 10) * Math.PI * 1.65
+        stroke(DIAL, 3.5, () =>
+          ctx.arc(cx + Math.cos(a) * 41, cy + Math.sin(a) * 41, 9, 0, Math.PI * 2),
+        )
+      }
+      fill(DIAL, () => ctx.arc(cx, cy, 17, 0, Math.PI * 2))
+      stroke(DIAL, 5, () => {
+        ctx.moveTo(cx + 46, cy + 30)
+        ctx.lineTo(cx + 62, cy + 44)
+      })
+    },
+  )
+}
+
 const GENERATORS: Record<
   ShapeName,
   (count: number, rand: () => number) => Float32Array
-> = { wordmark, wave, gear, sphere, clipboard, tunnel, helix, scatter, ring }
+> = {
+  wordmark,
+  wave,
+  gear,
+  sphere,
+  clipboard,
+  tunnel,
+  helix,
+  scatter,
+  ring,
+  trail,
+  phone,
+}
 
 export function buildShapes(count: number) {
   const shapes = {} as Record<ShapeName, Float32Array>
