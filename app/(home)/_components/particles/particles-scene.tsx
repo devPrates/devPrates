@@ -146,13 +146,17 @@ function Field({ count }: { count: number }) {
   const resolve = (key: SceneKey, out: ScenePose): ScenePose => {
     const portrait = viewport.aspect < 0.85
     const base: ScenePose = (portrait ? PORTRAIT_POSES : SCENE_POSES)[key]
-    Object.assign(out, base)
+    // O objeto é reaproveitado entre frames: campos opcionais precisam ser
+    // zerados, senão uma pose herda o giro/âncora da anterior.
+    Object.assign(out, { spin: 0, anchor: undefined }, base)
+    out.anchorEl = null
     if (base.anchor) {
       let el = anchors.current[base.anchor]
       if (el === undefined) {
         el = document.querySelector<HTMLElement>(base.anchor)
         anchors.current[base.anchor] = el
       }
+      out.anchorEl = el
       if (el) {
         const r = el.getBoundingClientRect()
         const vw = window.innerWidth
@@ -191,6 +195,10 @@ function Field({ count }: { count: number }) {
       )
       target = Math.min(n + k, list.length - 1)
     }
+    // O rodapé é mais baixo que a tela e nunca chega com o topo ao centro:
+    // no fim da página, a última cena vale inteira.
+    const scrollHeight = document.documentElement.scrollHeight
+    if (window.scrollY + vh >= scrollHeight - 2) target = list.length - 1
 
     // p é contínuo e amortecido: pular várias seções de uma vez (clique na
     // nav) passa rápido por todas as formas do caminho.
@@ -202,6 +210,25 @@ function Field({ count }: { count: number }) {
     const keyOf = (n: number) => (list[n]?.dataset.scene ?? 'hero') as SceneKey
     const a = resolve(keyOf(index), poseA)
     const b = resolve(keyOf(next), poseB)
+
+    // Quando as partículas já cobrem um PRATES (peso > 0.6), o SVG embaixo
+    // recebe data-particles-on e some via CSS; volta abaixo de 0.4.
+    for (const [pose, weight] of [
+      [a, 1 - k],
+      [b, k],
+    ] as const) {
+      const el = pose.anchorEl
+      if (!el) continue
+      const other = pose === a ? b : a
+      const w = weight + (other.anchorEl === el ? (pose === a ? k : 1 - k) : 0)
+      const on = el.hasAttribute('data-particles-on')
+      if (!on && w > 0.6) el.setAttribute('data-particles-on', '')
+      else if (on && w < 0.4) el.removeAttribute('data-particles-on')
+    }
+    for (const el of Object.values(anchors.current)) {
+      if (el && el !== a.anchorEl && el !== b.anchorEl)
+        el.removeAttribute('data-particles-on')
+    }
 
     // Troca o par de formas só quando muda de trecho.
     const pair = `${a.shape}>${b.shape}`

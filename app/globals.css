@@ -137,11 +137,20 @@ html.lenis body {
 
 /* Com o campo de partículas ativo, o PRATES do hero sobe em SVG e depois se
    dissolve: quem fica no lugar são as partículas, encaixadas por cima dele. */
-[data-particles-anchor] {
+[data-particles-anchor='hero'] {
   transition: opacity 1.4s ease 1.5s;
 }
 
-html.has-3d-scene [data-particles-anchor] {
+html.has-3d-scene [data-particles-anchor='hero'] {
+  opacity: 0;
+}
+
+/* No rodapé o PRATES sólido só some quando as partículas chegam nele. */
+[data-particles-anchor='footer'] {
+  transition: opacity 0.9s ease;
+}
+
+html.has-3d-scene [data-particles-anchor='footer'][data-particles-on] {
   opacity: 0;
 }
 

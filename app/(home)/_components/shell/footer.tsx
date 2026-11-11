@@ -7,8 +7,8 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="frame relative z-10 pb-6 pt-24">
-      <Wordmark className="w-full text-cream" />
+    <footer data-scene="footer" className="frame relative z-10 pb-6 pt-24">
+      <Wordmark className="w-full text-cream" data-particles-anchor="footer" />
       <DashLine className="mt-8" />
       <div className="label mt-5 flex flex-wrap items-center justify-between gap-4 text-driftwood">
         <span>© {year} Gabriel Prates Bitencourt</span>

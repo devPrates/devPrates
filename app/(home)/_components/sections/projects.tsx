@@ -3,6 +3,7 @@
 import {
   motion,
   MotionValue,
+  useInView,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -30,9 +31,9 @@ const easeOut = [0.16, 1, 0.3, 1] as const
 // Galeria horizontal: a seção trava na tela e o scroll vertical vira
 // movimento lateral da faixa de projetos (1px de scroll = 1px de faixa).
 // Em telas pequenas ou com movimento reduzido, vira um carrossel nativo.
-export function Projects() {
+export function Projects({ items }: { items: ProjectHighlight[] }) {
   const { projects } = homeContent
-  const total = projects.items.length
+  const total = items.length
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [pinned, setPinned] = useState(false)
@@ -132,7 +133,7 @@ export function Projects() {
             </p>
           </div>
 
-          {projects.items.map((project, i) => (
+          {items.map((project, i) => (
             <ProjectCard
               key={project.slug}
               project={project}
@@ -198,15 +199,31 @@ function ProjectCard({
 }) {
   // Alterna formato e altura para a faixa ter ritmo.
   const tall = index % 2 === 0
+  const ref = useRef<HTMLElement>(null)
+  const inView = useInView(ref, { once: true, amount: 0 })
+  // A imagem nunca pode ficar escondida: começa visível (SSR e sem JS), só
+  // fecha a cortina se o card ainda estiver fora da tela, e uma trava de
+  // segurança abre tudo depois de um tempo se o observer não disparar.
+  const [state, setState] = useState<'initial' | 'waiting' | 'shown'>('initial')
+  useEffect(() => {
+    if (inView) return setState('shown')
+    setState((s) => (s === 'initial' ? 'waiting' : s))
+  }, [inView])
+  useEffect(() => {
+    if (state !== 'waiting') return
+    const t = window.setTimeout(() => setState('shown'), 4000)
+    return () => window.clearTimeout(t)
+  }, [state])
+  const revealed = state !== 'waiting'
 
   return (
     <motion.article
+      ref={ref}
       style={{ skewX: skew }}
       // O gatilho fica aqui, fora do clip-path: um elemento 100% recortado
       // conta como invisível para o IntersectionObserver e nunca dispararia.
-      initial="hidden"
-      whileInView="shown"
-      viewport={{ once: true, amount: 0.1 }}
+      initial={false}
+      animate={revealed ? 'shown' : 'hidden'}
       className={cn(
         'w-[82vw] shrink-0 snap-start',
         tall ? 'md:w-[44.8vh]' : 'md:w-[64vh]',
@@ -243,6 +260,7 @@ function ProjectCard({
                 alt={`Projeto ${project.title}`}
                 fill
                 sizes="(min-width: 768px) 45vw, 82vw"
+                priority={index < 2}
                 className="object-cover transition-[transform,filter] duration-[1.2s] ease-out-expo group-hover:scale-[1.06] group-hover:brightness-75"
               />
             </motion.div>
@@ -264,14 +282,14 @@ function ProjectCard({
 
         <DashLine className="mt-5" delay={0.3} />
         <div className="mt-4 flex items-baseline justify-between gap-6">
-          <h3 className="text-heading-sm font-medium uppercase">
+          <h3 className="line-clamp-2 text-heading-sm font-medium uppercase leading-tight">
             <FlipText>{project.title}</FlipText>
           </h3>
           <span className="label shrink-0 text-driftwood">
             {project.category} · {project.year}
           </span>
         </div>
-        <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-cream/70">
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-cream/70">
           {project.summary}
         </p>
         <ul className="mt-3 flex flex-wrap gap-2">

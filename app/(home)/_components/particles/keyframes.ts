@@ -17,6 +17,8 @@ export type ScenePose = {
   opacity: number
   spin?: number
   anchor?: string
+  // Preenchido em tempo de execução: o elemento da âncora, se existir.
+  anchorEl?: HTMLElement | null
 }
 
 export const SCENE_POSES = {
@@ -27,7 +29,7 @@ export const SCENE_POSES = {
     size: 0.9,
     rot: [0, 0, 0],
     opacity: 1,
-    anchor: '[data-particles-anchor]',
+    anchor: '[data-particles-anchor="hero"]',
   },
   manifesto: {
     shape: 'wave',
@@ -92,12 +94,23 @@ export const SCENE_POSES = {
     spin: -0.04,
   },
   contact: {
-    shape: 'ring',
-    x: 0.24,
+    shape: 'scatter',
+    x: 0,
+    y: 0,
+    size: 1,
+    rot: [0, 0, 0],
+    opacity: 0.3,
+    spin: 0.04,
+  },
+  // Fim da página: as partículas voltam a ser o PRATES, agora o do rodapé.
+  footer: {
+    shape: 'wordmark',
+    x: 0,
     y: -0.3,
-    size: 0.32,
-    rot: [1.15, 0, 0.1],
-    opacity: 0.95,
+    size: 0.9,
+    rot: [0, 0, 0],
+    opacity: 1,
+    anchor: '[data-particles-anchor="footer"]',
   },
 } satisfies Record<string, ScenePose>
 

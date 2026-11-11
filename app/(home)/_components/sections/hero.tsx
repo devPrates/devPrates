@@ -19,7 +19,7 @@ function HeroWordmark({ play }: { play: boolean }) {
     <svg
       viewBox={`0 0 ${WORDMARK_VIEWBOX.width} ${WORDMARK_VIEWBOX.height}`}
       className="w-full overflow-hidden text-cream"
-      data-particles-anchor
+      data-particles-anchor="hero"
       aria-hidden
     >
       {WORDMARK_LETTERS.map((letter, i) => (
