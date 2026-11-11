@@ -10,7 +10,7 @@ export function Manifesto() {
   return (
     <section
       id="sobre"
-      data-medallion="manifesto"
+      data-scene="manifesto"
       className="frame relative z-10 grid min-h-svh items-center gap-10 py-32 lg:grid-cols-[1fr_minmax(280px,38vh)_1fr] lg:gap-[18px]"
     >
       <div>

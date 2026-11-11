@@ -8,7 +8,7 @@ export function Experience() {
 
   return (
     <section
-      data-medallion="experience"
+      data-scene="experience"
       className="frame relative z-10 py-32"
     >
       <div className="lg:ml-[25%]">

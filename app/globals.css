@@ -135,12 +135,13 @@ html.lenis body {
   }
 }
 
-/* Com o medalhão 3D ativo, a versão 2D do hero sai de cena. */
-.medallion-static {
-  transition: opacity 0.8s ease;
+/* Com o campo de partículas ativo, o PRATES do hero sobe em SVG e depois se
+   dissolve: quem fica no lugar são as partículas, encaixadas por cima dele. */
+[data-particles-anchor] {
+  transition: opacity 1.4s ease 1.5s;
 }
 
-html.has-3d-medallion .medallion-static {
+html.has-3d-scene [data-particles-anchor] {
   opacity: 0;
 }
 

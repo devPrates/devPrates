@@ -12,7 +12,7 @@ export function Comparison() {
 
   return (
     <section
-      data-medallion="comparison"
+      data-scene="comparison"
       className="frame relative z-10 py-32 pb-48"
     >
       <p className="label mb-6 text-gold-bright">

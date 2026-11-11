@@ -36,7 +36,7 @@ export function Services() {
   return (
     <section
       ref={ref}
-      data-medallion="services"
+      data-scene="services"
       className="relative z-10"
       style={{ height: `${total * 100}svh` }}
     >

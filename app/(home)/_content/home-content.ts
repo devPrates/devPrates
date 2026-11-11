@@ -24,6 +24,8 @@ export type ProjectHighlight = {
   category: string
   year: string
   thumbnail: string
+  summary: string
+  stack: string[]
 }
 
 export type Experience = {
@@ -121,6 +123,7 @@ export const homeContent = {
     eyebrow: '04 — Projetos',
     heading: 'Trabalhos selecionados.',
     cta: 'Ver todos os projetos',
+    hint: 'Role para ver',
     items: [
       {
         slug: 'software-puroqueijo',
@@ -128,6 +131,8 @@ export const homeContent = {
         category: 'Sistema web',
         year: '2025',
         thumbnail: `${HYGRAPH_ASSETS}/XeDhqnxRcOUVTlzhorfu`,
+        summary: 'Gestão de produção e vendas para uma queijaria, do pedido à entrega.',
+        stack: ['Next.js', 'Postgres', 'Tailwind'],
       },
       {
         slug: 'agroclima-net',
@@ -135,6 +140,8 @@ export const homeContent = {
         category: 'Sistema web',
         year: '2025',
         thumbnail: `${HYGRAPH_ASSETS}/cmgs1n3gf04y507kjc8q21jn1`,
+        summary: 'Painel de clima para o campo: previsões e alertas por propriedade.',
+        stack: ['React', 'APIs', 'Gráficos'],
       },
       {
         slug: 'curso-react-ifms',
@@ -142,6 +149,8 @@ export const homeContent = {
         category: 'Ensino',
         year: '2025',
         thumbnail: `${HYGRAPH_ASSETS}/JQyHCUERQOnnMfxBMBgQ`,
+        summary: 'Curso de React no IFMS: do primeiro componente ao projeto publicado.',
+        stack: ['React', 'Ensino', 'Projetos'],
       },
       {
         slug: 'curso-python-ifms',
@@ -149,6 +158,8 @@ export const homeContent = {
         category: 'Ensino',
         year: '2025',
         thumbnail: `${HYGRAPH_ASSETS}/cmgs1zhos050w07lrw1u5vc5d`,
+        summary: 'Curso de Python no IFMS, com foco em lógica e análise de dados.',
+        stack: ['Python', 'Pandas', 'Ensino'],
       },
     ] satisfies ProjectHighlight[],
   },

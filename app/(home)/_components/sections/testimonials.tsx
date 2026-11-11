@@ -11,7 +11,7 @@ export function Testimonials() {
 
   return (
     <section
-      data-medallion="testimonials"
+      data-scene="testimonials"
       className="frame relative z-10 py-32"
     >
       <p className="label mb-6 text-gold-bright">

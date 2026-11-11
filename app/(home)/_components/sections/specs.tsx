@@ -11,7 +11,7 @@ export function Specs() {
 
   return (
     <section
-      data-medallion="specs"
+      data-scene="specs"
       className="frame relative z-10 grid min-h-svh items-center py-32 lg:grid-cols-2"
     >
       <div aria-hidden className="hidden lg:block" />

@@ -42,7 +42,7 @@ export function Contact() {
   return (
     <section
       id="contato"
-      data-medallion="contact"
+      data-scene="contact"
       className="frame relative z-10 grid min-h-svh items-center gap-16 py-32 lg:grid-cols-2"
     >
       <div>

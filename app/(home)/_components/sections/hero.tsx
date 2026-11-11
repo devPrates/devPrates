@@ -2,7 +2,6 @@
 
 import { motion } from 'motion/react'
 import { homeContent } from '../../_content/home-content'
-import { MedallionStatic } from '../brand/medallion-static'
 import {
   WORDMARK_LETTERS,
   WORDMARK_VIEWBOX,
@@ -20,6 +19,7 @@ function HeroWordmark({ play }: { play: boolean }) {
     <svg
       viewBox={`0 0 ${WORDMARK_VIEWBOX.width} ${WORDMARK_VIEWBOX.height}`}
       className="w-full overflow-hidden text-cream"
+      data-particles-anchor
       aria-hidden
     >
       {WORDMARK_LETTERS.map((letter, i) => (
@@ -43,13 +43,11 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      data-medallion="hero"
+      data-scene="hero"
       className="frame relative flex min-h-[640px] flex-col justify-between overflow-hidden pb-6 pt-24 sm:pt-28 h-svh"
     >
-      {/* Medalhão 2D na mesma posição da pose "hero" do 3D. */}
-      <MedallionStatic className="pointer-events-none absolute left-1/2 top-[54%] size-[46vh] -translate-x-1/2 -translate-y-1/2 opacity-90 lg:left-[70%] lg:size-[58vh]" />
 
-      <div className="relative z-10 max-w-[64vw] max-lg:max-w-full">
+      <div className="relative z-10 flex flex-1 flex-col justify-center pb-10">
         <h1 className="sr-only">
           Gabriel Prates, {homeContent.hero.cardTitle}
         </h1>

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Medallion } from './_components/medallion/medallion'
+import { Particles } from './_components/particles/particles'
 import { Cursor } from './_components/motion/cursor'
 import { IntroProvider } from './_components/motion/intro'
 import { MotionProvider } from './_components/motion/motion-provider'
@@ -18,7 +18,7 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
           <SmoothScroll>
             <Preloader />
             <Cursor />
-            <Medallion />
+            <Particles />
             <Nav />
             <SideLabel />
             <main className="relative">{children}</main>
