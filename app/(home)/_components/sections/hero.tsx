@@ -6,6 +6,7 @@ import {
   WORDMARK_LETTERS,
   WORDMARK_VIEWBOX,
 } from '../brand/wordmark-paths'
+import { HeroAvatar } from '../avatar/hero-avatar'
 import { DashLine } from '../motion/dash-line'
 import { useIntro } from '../motion/intro'
 import { ScrambleText } from '../motion/scramble-text'
@@ -44,19 +45,22 @@ export function Hero() {
     <section
       id="inicio"
       data-scene="hero"
-      className="frame relative flex min-h-[640px] flex-col justify-between overflow-hidden pb-6 pt-24 sm:pt-28 h-svh"
+      className="frame relative flex min-h-svh flex-col justify-between overflow-hidden pb-6 pt-24 sm:pt-28 lg:h-svh lg:min-h-[640px]"
     >
-
-      <div className="relative z-10 flex flex-1 flex-col justify-center pb-10">
-        <h1 className="sr-only">
-          Gabriel Prates, {homeContent.hero.cardTitle}
-        </h1>
-        <p className="label mb-4 text-gold-bright">
-          <ScrambleText waitIntro delay={300}>
-            {hero.tagline}
-          </ScrambleText>
-        </p>
-        <HeroWordmark play={done} />
+      {/* PRATES em 2/3 da largura e o avatar 3D no terço da direita. */}
+      <div className="relative z-10 grid flex-1 items-center gap-8 pb-10 lg:grid-cols-[2fr_1fr] lg:gap-10">
+        <div className="max-lg:pt-10">
+          <h1 className="sr-only">
+            Gabriel Prates, {homeContent.hero.cardTitle}
+          </h1>
+          <p className="label mb-4 text-gold-bright">
+            <ScrambleText waitIntro delay={300}>
+              {hero.tagline}
+            </ScrambleText>
+          </p>
+          <HeroWordmark play={done} />
+        </div>
+        <HeroAvatar className="h-[clamp(260px,40svh,380px)] lg:h-[min(clamp(360px,60vh,640px),calc(100svh-300px))]" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
