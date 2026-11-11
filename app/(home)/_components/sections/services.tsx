@@ -15,7 +15,8 @@ import { SplitReveal } from '../motion/split-reveal'
 const ease = [0.16, 1, 0.3, 1] as const
 
 // Cena fixa: a seção tem 3 telas de altura e o conteúdo fica parado no topo
-// enquanto o scroll troca o serviço ativo (e o medalhão gira ao lado).
+// enquanto o scroll troca o serviço ativo. Ao lado, as partículas formam
+// um programador no notebook e um operário de capacete anotando.
 export function Services() {
   const { services } = homeContent
   const ref = useRef<HTMLElement>(null)

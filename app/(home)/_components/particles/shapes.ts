@@ -7,7 +7,7 @@ export type ShapeName =
   | 'wordmark'
   | 'wave'
   | 'gear'
-  | 'sphere'
+  | 'crew'
   | 'clipboard'
   | 'tunnel'
   | 'helix'
@@ -339,20 +339,236 @@ function toothProfile(t: number) {
   return 0
 }
 
-// Esfera (fibonacci) com uma casca de poeira por fora.
-function sphere(count: number, rand: () => number) {
-  const out = new Float32Array(count * 3)
-  const golden = Math.PI * (3 - Math.sqrt(5))
-  for (let i = 0; i < count; i++) {
-    const y = 1 - (i / (count - 1)) * 2
-    const r = Math.sqrt(1 - y * y)
-    const theta = golden * i
-    const shell = rand() < 0.12 ? 1 + rand() * 0.35 : 1
-    out[i * 3] = Math.cos(theta) * r * shell
-    out[i * 3 + 1] = y * shell
-    out[i * 3 + 2] = Math.sin(theta) * r * shell
-  }
-  return out
+// Programador e operário juntos: à esquerda, alguém sentado no notebook com
+// código na tela, `</>` no ar e café na mesa; à direita, um operário de
+// capacete e colete, segurando a folha com o croqui e anotando a lápis.
+function crew(count: number, rand: () => number) {
+  const BODY = 1
+  const EDGE = 2
+  const SCREEN = 3
+  const CODE = 4
+  const HELMET = 5
+  const PAPER = 6
+  const PENCIL = 7
+  const VEST = 8
+  const FLOOR = 9
+  const jitter = jitterOf(rand)
+  return sampleCanvas(
+    count,
+    rand,
+    800,
+    560,
+    {
+      [BODY]: { share: 0.07, z: jitter(-0.03, 0.03) },
+      [EDGE]: { share: 0.24, z: jitter(-0.01, 0.03) },
+      [SCREEN]: { share: 0.09, z: jitter(0.04, 0.02) },
+      [CODE]: { share: 0.17, z: jitter(0.05, 0.01) },
+      [HELMET]: { share: 0.12, z: jitter(0.03, 0.03) },
+      [PAPER]: { share: 0.13, z: jitter(0.07, 0.01) },
+      [PENCIL]: { share: 0.06, z: jitter(0.09, 0.01) },
+      [VEST]: { share: 0.06, z: jitter(0.02, 0.01) },
+      [FLOOR]: { share: 0.06, z: jitter(0, 0.02) },
+    },
+    (ctx) => {
+      const { fill, stroke } = pens(ctx)
+      // Membro com contorno: traço grosso na borda e o miolo por cima.
+      const limb = (width: number, path: () => void) => {
+        stroke(EDGE, width, path)
+        stroke(BODY, width - 8, path)
+      }
+      const shape = (path: () => void) => {
+        fill(BODY, path)
+        stroke(EDGE, 5, path)
+      }
+
+      // Chão
+      stroke(
+        FLOOR,
+        3,
+        () => {
+          ctx.moveTo(30, 524)
+          ctx.lineTo(770, 524)
+        },
+        [14, 12],
+      )
+
+      // ---------- Programador ----------
+      // Cadeira: encosto, assento, coluna e base com rodinhas
+      stroke(EDGE, 9, () => {
+        ctx.moveTo(62, 225)
+        ctx.lineTo(78, 362)
+        ctx.lineTo(175, 362)
+        ctx.moveTo(122, 362)
+        ctx.lineTo(122, 478)
+        ctx.moveTo(78, 486)
+        ctx.lineTo(166, 486)
+      })
+      fill(EDGE, () => ctx.arc(80, 500, 9, 0, Math.PI * 2))
+      fill(EDGE, () => ctx.arc(164, 500, 9, 0, Math.PI * 2))
+      // Pernas: coxa, canela e pé
+      limb(40, () => {
+        ctx.moveTo(118, 345)
+        ctx.lineTo(222, 352)
+        ctx.lineTo(228, 470)
+      })
+      limb(20, () => {
+        ctx.moveTo(226, 482)
+        ctx.lineTo(262, 486)
+      })
+      // Tronco levemente inclinado para a tela
+      limb(58, () => {
+        ctx.moveTo(116, 338)
+        ctx.lineTo(150, 252)
+      })
+      // Cabeça com headphone no pescoço
+      shape(() => ctx.arc(170, 192, 36, 0, Math.PI * 2))
+      stroke(EDGE, 7, () => ctx.arc(160, 238, 26, Math.PI * 0.15, Math.PI * 0.95))
+      // Braço até o teclado
+      limb(24, () => {
+        ctx.moveTo(152, 262)
+        ctx.lineTo(196, 322)
+        ctx.lineTo(272, 320)
+      })
+
+      // Mesa
+      stroke(EDGE, 10, () => {
+        ctx.moveTo(236, 340)
+        ctx.lineTo(500, 340)
+        ctx.moveTo(256, 340)
+        ctx.lineTo(256, 524)
+        ctx.moveTo(480, 340)
+        ctx.lineTo(480, 524)
+      })
+
+      // Notebook: base e tela de frente, com linhas de código
+      fill(SCREEN, () => {
+        ctx.moveTo(268, 334)
+        ctx.lineTo(398, 334)
+        ctx.lineTo(392, 326)
+        ctx.lineTo(276, 326)
+        ctx.closePath()
+      })
+      const screen = () => {
+        ctx.moveTo(284, 324)
+        ctx.lineTo(388, 324)
+        ctx.lineTo(400, 210)
+        ctx.lineTo(296, 210)
+        ctx.closePath()
+      }
+      stroke(SCREEN, 6, screen)
+      const code: [number, number][] = [
+        [0, 52],
+        [1, 40],
+        [2, 30],
+        [2, 44],
+        [1, 22],
+        [1, 48],
+        [0, 18],
+      ]
+      code.forEach(([indent, width], k) => {
+        const y = 226 + k * 13
+        // A tela é inclinada: a borda esquerda anda para a direita ao subir.
+        const left = 300 + ((324 - y) / 114) * 12 + indent * 12
+        fill(CODE, () => ctx.rect(left, y, width, 6))
+      })
+      // </> no ar
+      stroke(CODE, 6, () => {
+        ctx.moveTo(326, 160)
+        ctx.lineTo(310, 175)
+        ctx.lineTo(326, 190)
+        ctx.moveTo(338, 196)
+        ctx.lineTo(354, 154)
+        ctx.moveTo(366, 160)
+        ctx.lineTo(382, 175)
+        ctx.lineTo(366, 190)
+      })
+      // Caneca com fumaça
+      stroke(EDGE, 5, () => ctx.rect(428, 300, 28, 36))
+      stroke(EDGE, 5, () => ctx.arc(458, 318, 10, -Math.PI / 2, Math.PI / 2))
+      stroke(FLOOR, 3, () => {
+        ctx.moveTo(436, 290)
+        ctx.bezierCurveTo(426, 278, 446, 270, 436, 256)
+        ctx.moveTo(449, 290)
+        ctx.bezierCurveTo(439, 278, 459, 270, 449, 256)
+      })
+
+      // ---------- Operário ----------
+      // Pernas e botas
+      limb(32, () => {
+        ctx.moveTo(606, 404)
+        ctx.lineTo(598, 500)
+      })
+      limb(32, () => {
+        ctx.moveTo(644, 404)
+        ctx.lineTo(654, 500)
+      })
+      fill(EDGE, () => ctx.roundRect(574, 498, 44, 22, 8))
+      fill(EDGE, () => ctx.roundRect(642, 498, 44, 22, 8))
+      // Tronco com colete e faixas refletivas
+      shape(() => ctx.roundRect(580, 250, 86, 162, 22))
+      fill(VEST, () => ctx.rect(582, 320, 82, 9))
+      fill(VEST, () => ctx.rect(582, 346, 82, 9))
+      // Cabeça e capacete (cúpula, aba e nervuras)
+      shape(() => ctx.arc(622, 212, 33, 0, Math.PI * 2))
+      fill(HELMET, () => ctx.arc(624, 202, 40, Math.PI, Math.PI * 2))
+      fill(HELMET, () => ctx.roundRect(566, 197, 110, 11, 5))
+      ctx.globalCompositeOperation = 'destination-out'
+      stroke(HELMET, 4, () => {
+        ctx.moveTo(612, 166)
+        ctx.lineTo(612, 194)
+        ctx.moveTo(636, 166)
+        ctx.lineTo(636, 194)
+      })
+      ctx.globalCompositeOperation = 'source-over'
+
+      // Braço de trás segurando a folha na frente do peito
+      limb(22, () => {
+        ctx.moveTo(592, 272)
+        ctx.lineTo(560, 338)
+        ctx.lineTo(548, 318)
+      })
+      // Folha com linhas e um croqui (caixa + seta)
+      const paper = () => {
+        ctx.moveTo(496, 252)
+        ctx.lineTo(566, 260)
+        ctx.lineTo(558, 352)
+        ctx.lineTo(488, 344)
+        ctx.closePath()
+      }
+      stroke(PAPER, 5, paper)
+      ;[0, 1, 2].forEach((k) => {
+        stroke(PAPER, 3, () => {
+          ctx.moveTo(504, 272 + k * 12)
+          ctx.lineTo(548 - k * 8, 277 + k * 12)
+        })
+      })
+      stroke(PAPER, 3, () => ctx.rect(502, 312, 24, 22))
+      stroke(PAPER, 3, () => {
+        ctx.moveTo(528, 323)
+        ctx.lineTo(548, 325)
+        ctx.moveTo(542, 318)
+        ctx.lineTo(548, 325)
+        ctx.lineTo(541, 331)
+      })
+      // Braço da frente com o lápis anotando
+      limb(22, () => {
+        ctx.moveTo(656, 276)
+        ctx.lineTo(646, 336)
+        ctx.lineTo(590, 322)
+      })
+      stroke(PENCIL, 9, () => {
+        ctx.moveTo(600, 330)
+        ctx.lineTo(548, 296)
+      })
+      fill(PENCIL, () => {
+        ctx.moveTo(550, 291)
+        ctx.lineTo(534, 288)
+        ctx.lineTo(545, 301)
+        ctx.closePath()
+      })
+      fill(PENCIL, () => ctx.arc(604, 333, 6, 0, Math.PI * 2))
+    },
+  )
 }
 
 // Túnel: anéis ao longo do eixo z, para ficar ao fundo da galeria.
@@ -661,7 +877,7 @@ const GENERATORS: Record<
   wordmark,
   wave,
   gear,
-  sphere,
+  crew,
   clipboard,
   tunnel,
   helix,

@@ -45,13 +45,14 @@ export const SCENE_POSES = {
     anchor: '[data-particles-anchor="manifesto"]',
   },
   services: {
-    shape: 'sphere',
-    x: 0.24,
+    // Programador + operário, à direita do texto. Sem giro: de costas a
+    // cena apareceria espelhada.
+    shape: 'crew',
+    x: 0.2,
     y: 0,
-    size: 0.62,
-    rot: [0.3, 0, 0.2],
+    size: 0.74,
+    rot: [-0.08, -0.25, 0],
     opacity: 0.95,
-    spin: 0.18,
   },
   specs: {
     // Prancheta com a ficha, levemente inclinada. Sem giro: de costas a
