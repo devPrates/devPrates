@@ -45,9 +45,9 @@ export const SCENE_POSES = {
     anchor: '[data-particles-anchor="manifesto"]',
   },
   services: {
-    // Programador + operário, à direita do texto. Sem giro: de costas a
-    // cena apareceria espelhada.
-    shape: 'crew',
+    // Dev (estilo avatar do hero) no notebook cercado de linguagens.
+    // Sem giro: de costas as etiquetas apareceriam espelhadas.
+    shape: 'coder',
     x: 0.2,
     y: 0,
     size: 0.74,
@@ -91,8 +91,9 @@ export const SCENE_POSES = {
     opacity: 0.95,
   },
   contact: {
-    // Pessoa no telefone de disco, à direita do texto e dos botões.
-    shape: 'phone',
+    // Prates de headset no atendimento, cercado dos canais de contato.
+    // Sem giro: de costas os balões apareceriam espelhados.
+    shape: 'support',
     x: 0.22,
     y: 0,
     size: 0.76,

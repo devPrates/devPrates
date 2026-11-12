@@ -9,7 +9,6 @@ import { fragmentShader, vertexShader } from './shaders'
 import { buildDust, buildRandoms, buildShapes } from './shapes'
 
 const lerp = THREE.MathUtils.lerp
-const TAU = Math.PI * 2
 
 // Posição do mouse lida na janela: o canvas fica atrás do conteúdo com
 // pointer-events: none e não recebe eventos.
@@ -152,13 +151,30 @@ function Field({ count }: { count: number }) {
 
   // Pose de uma seção. Com âncora, posição e tamanho saem do retângulo do
   // elemento na tela: o PRATES de partículas cobre exatamente o do SVG.
-  const resolve = (key: SceneKey, out: ScenePose): ScenePose => {
+  const resolve = (
+    key: SceneKey,
+    out: ScenePose,
+    section?: HTMLElement,
+  ): ScenePose => {
     const portrait = viewport.aspect < 0.85
     const base: ScenePose = (portrait ? PORTRAIT_POSES : SCENE_POSES)[key]
     // O objeto é reaproveitado entre frames: campos opcionais precisam ser
     // zerados, senão uma pose herda o giro/âncora da anterior.
     Object.assign(out, { spin: 0, roll: 0, anchor: undefined }, base)
     out.anchorEl = null
+    // Sem âncora, a forma age como um elemento sticky dentro da própria
+    // seção: fica no centro da tela enquanto a seção cobre a tela, mas entra
+    // e sai rolando junto com ela. Assim a forma não aparece por cima da
+    // seção vizinha (de cima ou de baixo) durante a troca.
+    if (section) {
+      const r = section.getBoundingClientRect()
+      const vh = window.innerHeight
+      const lo = r.top + vh / 2
+      const hi = r.bottom - vh / 2
+      const c =
+        hi < lo ? (r.top + r.bottom) / 2 : THREE.MathUtils.clamp(vh / 2, lo, hi)
+      out.y = base.y + (vh / 2 - c) / vh
+    }
     if (base.anchor) {
       let el = anchors.current[base.anchor]
       if (el === undefined) {
@@ -172,7 +188,6 @@ function Field({ count }: { count: number }) {
       if (r && r.width === 0) {
         out.anchorEl = null
         out.x = 0
-        out.y = 0
         out.size = Math.min(out.size, 0.5)
         out.opacity *= 0.45
       } else if (r) {
@@ -225,8 +240,8 @@ function Field({ count }: { count: number }) {
     const k = s.p - index
 
     const keyOf = (n: number) => (list[n]?.dataset.scene ?? 'hero') as SceneKey
-    const a = resolve(keyOf(index), poseA)
-    const b = resolve(keyOf(next), poseB)
+    const a = resolve(keyOf(index), poseA, list[index])
+    const b = resolve(keyOf(next), poseB, list[next])
 
     // Quando as partículas já cobrem um PRATES (peso > 0.6), o SVG embaixo
     // recebe data-particles-on e some via CSS; volta abaixo de 0.4.
@@ -312,12 +327,25 @@ function Field({ count }: { count: number }) {
       lerp(a.rot[2], b.rot[2], k),
     )
 
-    // Giro contínuo. Nas formas paradas ele volta para a volta inteira mais
-    // próxima, e o PRATES fica sempre de frente.
-    const spinSpeed = lerp(a.spin ?? 0, b.spin ?? 0, k)
-    if (Math.abs(spinSpeed) > 0.005) s.spin += spinSpeed * dt
-    else easing.damp(s, 'spin', Math.round(s.spin / TAU) * TAU, 0.5, dt)
-    i.rotation.y = s.spin
+    // Peso do giro na mistura das duas formas. A forma que sai desfaz o
+    // giro na primeira metade da transição (partículas ainda soltas) e a
+    // que entra só começa a girar na segunda: assim uma forma parada nunca
+    // se monta de cabeça para baixo ou espelhada e depois desvira.
+    const spinWeight = (wa: boolean, wb: boolean) =>
+      (wa ? 1 - THREE.MathUtils.smoothstep(k, 0, 0.5) : 0) +
+      (wb ? THREE.MathUtils.smoothstep(k, 0.5, 1) : 0)
+    // Com a forma que gira inteira na tela, o ângulo é trazido para
+    // (-π, π]: desfazer o giro depois nunca passa de meia volta. No meio da
+    // transição ele não é mexido, para não dar salto.
+    const wrap = (angle: number, weight: number) =>
+      weight > 0.995 ? Math.atan2(Math.sin(angle), Math.cos(angle)) : angle
+
+    // Giro contínuo no eixo y.
+    const spinA = Math.abs(a.spin ?? 0) > 0.005
+    const spinB = Math.abs(b.spin ?? 0) > 0.005
+    const spinW = spinWeight(spinA, spinB)
+    s.spin = wrap(s.spin + lerp(a.spin ?? 0, b.spin ?? 0, k) * dt, spinW)
+    i.rotation.y = s.spin * spinW
 
     // Giro no próprio eixo (z), para a engrenagem: velocidade fixa da pose
     // mais o scroll, como se rolar a página empurrasse os dentes.
@@ -325,13 +353,14 @@ function Field({ count }: { count: number }) {
     const scrollNow = window.scrollY
     const scrollDelta = s.lastScroll < 0 ? 0 : scrollNow - s.lastScroll
     s.lastScroll = scrollNow
-    if (Math.abs(rollSpeed) > 0.005) {
+    const rollA = Math.abs(a.roll ?? 0) > 0.005
+    const rollB = Math.abs(b.roll ?? 0) > 0.005
+    const rollW = spinWeight(rollA, rollB)
+    if (rollA || rollB) {
       const weight = rollSpeed / Math.max(a.roll ?? 0, b.roll ?? 0, 0.001)
-      s.roll += rollSpeed * dt + scrollDelta * 0.002 * weight
-    } else {
-      easing.damp(s, 'roll', Math.round(s.roll / TAU) * TAU, 0.5, dt)
+      s.roll = wrap(s.roll + rollSpeed * dt + scrollDelta * 0.002 * weight, rollW)
     }
-    i.rotation.z = s.roll
+    i.rotation.z = s.roll * rollW
 
     // Mouse em coordenadas do mundo (plano z = 0).
     easing.damp2(
