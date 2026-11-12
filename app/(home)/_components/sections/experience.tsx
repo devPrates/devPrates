@@ -1,11 +1,13 @@
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { DashLine } from '../motion/dash-line'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
-export function Experience() {
-  const { experience } = homeContent
-
+export function Experience({
+  experience,
+}: {
+  experience: HomeData['experience']
+}) {
   return (
     <section
       data-scene="experience"

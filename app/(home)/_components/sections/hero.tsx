@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import {
   WORDMARK_LETTERS,
   WORDMARK_VIEWBOX,
@@ -37,9 +37,8 @@ function HeroWordmark({ play }: { play: boolean }) {
   )
 }
 
-export function Hero() {
+export function Hero({ hero }: { hero: HomeData['hero'] }) {
   const { done } = useIntro()
-  const { hero } = homeContent
 
   return (
     <section
@@ -52,7 +51,7 @@ export function Hero() {
       <div className="relative z-10 flex flex-1 flex-col gap-8 pb-10 lg:static lg:block lg:flex-none lg:pb-0 lg:pt-[4svh]">
         <div className="max-lg:pt-10 lg:w-[70%]">
           <h1 className="sr-only">
-            Gabriel Prates, {homeContent.hero.cardTitle}
+            Gabriel Prates, {hero.cardTitle}
           </h1>
           <p className="label mb-4 text-gold-bright">
             <ScrambleText waitIntro delay={300}>

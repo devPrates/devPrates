@@ -8,7 +8,7 @@ import {
   useTransform,
 } from 'motion/react'
 import { useRef, useState } from 'react'
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
@@ -17,8 +17,11 @@ const ease = [0.16, 1, 0.3, 1] as const
 // Cena fixa: a seção tem 3 telas de altura e o conteúdo fica parado no topo
 // enquanto o scroll troca o serviço ativo. Ao lado, as partículas formam
 // um programador no notebook e um operário de capacete anotando.
-export function Services() {
-  const { services } = homeContent
+export function Services({
+  services,
+}: {
+  services: HomeData['services']
+}) {
   const ref = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const total = services.items.length

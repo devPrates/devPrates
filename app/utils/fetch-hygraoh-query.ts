@@ -15,8 +15,11 @@ export const fetchHygraphQuery = async <T>(
         Accept: 'application/json',
         Authorization: `Bearer ${process.env.HYGRAPH_TOKEN}`,
       },
+      // A tag deixa o webhook (app/api/revalidate) invalidar tudo de uma vez;
+      // o revalidate por tempo fica de reserva.
       next: {
         revalidate,
+        tags: ['hygraph'],
       },
       body: JSON.stringify({
         query,

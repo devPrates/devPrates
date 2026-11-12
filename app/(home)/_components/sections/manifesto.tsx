@@ -1,11 +1,14 @@
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
 // Seção "void": título à esquerda, engrenagem ao centro (vem do canvas 3D),
 // texto corrido à direita. O padrão de três colunas do DESIGN.md.
-export function Manifesto() {
-  const { manifesto } = homeContent
+export function Manifesto({
+  manifesto,
+}: {
+  manifesto: HomeData['manifesto']
+}) {
 
   return (
     <section

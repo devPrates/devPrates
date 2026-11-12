@@ -1,4 +1,4 @@
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { Counter } from '../motion/counter'
 import { DashLine } from '../motion/dash-line'
 import { ScrambleText } from '../motion/scramble-text'
@@ -6,9 +6,7 @@ import { SplitReveal } from '../motion/split-reveal'
 
 // Ficha técnica no formato de especificação de produto. As partículas viram
 // uma prancheta com a ficha à esquerda; o conteúdo ocupa a metade direita.
-export function Specs() {
-  const { specs } = homeContent
-
+export function Specs({ specs }: { specs: HomeData['specs'] }) {
   return (
     <section
       data-scene="specs"

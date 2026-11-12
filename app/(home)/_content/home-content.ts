@@ -1,5 +1,7 @@
-// Conteúdo MOCKADO da home nova. Os tipos espelham os modelos que vão
-// existir no Hygraph; quando o conteúdo for real, só a origem muda.
+// Conteúdo local da home. O conteúdo de verdade vem do Hygraph (ver
+// get-home-content.ts); este arquivo dá os tipos, o que é layout (nav,
+// eyebrows, numeração) e serve de reserva quando o Hygraph falha ou um campo
+// está vazio.
 
 export type NavItem = { label: string; href: `#${string}` }
 
@@ -39,6 +41,10 @@ export type ProcessStep = {
   index: string
   title: string
   body: string
+}
+
+export type HomeData = typeof homeContent & {
+  person: { image?: string; sameAs: string[] }
 }
 
 const HYGRAPH_ASSETS = 'https://sa-east-1.graphassets.com/AYnkdiyktTw6btCR8j83nz'

@@ -1,15 +1,14 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { DashLine } from '../motion/dash-line'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
 // Como eu trabalho: 4 etapas à esquerda; à direita as partículas viram uma
 // trilha ligando 4 marcos até a bandeira de chegada.
-export function Process() {
-  const { process } = homeContent
+export function Process({ process }: { process: HomeData['process'] }) {
 
   return (
     <section

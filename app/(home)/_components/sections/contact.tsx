@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { HiArrowNarrowRight } from 'react-icons/hi'
-import { homeContent } from '../../_content/home-content'
+import type { HomeData } from '../../_content/home-content'
 import { ContactModal } from '../contact-modal'
 import { FlipText } from '../motion/flip-text'
 import { ScrambleText } from '../motion/scramble-text'
@@ -12,8 +12,13 @@ import { SplitReveal } from '../motion/split-reveal'
 // Contato: texto e botões à esquerda; à direita as partículas viram uma
 // pessoa falando num telefone de disco. O formulário abre num modal e o
 // WhatsApp vai direto para a conversa (o número vem da env, no servidor).
-export function Contact({ whatsappHref }: { whatsappHref?: string }) {
-  const { contact } = homeContent
+export function Contact({
+  contact,
+  whatsappHref,
+}: {
+  contact: HomeData['contact']
+  whatsappHref?: string
+}) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
 
