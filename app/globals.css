@@ -70,6 +70,11 @@
     @apply bg-walnut text-cream;
     font-feature-settings: 'ss01' on;
   }
+
+  /* Área restrita (login + dashboard): tema de app, escuro e neutro. */
+  html:has([data-theme='app']) body {
+    @apply bg-zinc-950 text-zinc-100;
+  }
 }
 
 /* No v4 `container` é uma utility nativa; aqui ela é estendida. */
@@ -107,6 +112,15 @@ html:has([data-theme='prates']) *::-webkit-scrollbar-track {
 
 html:has([data-theme='prates']) *::-webkit-scrollbar-thumb {
   background-color: var(--color-gold);
+}
+
+/* Área restrita: barra discreta, no tom do tema zinc. */
+html:has([data-theme='app']) *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html:has([data-theme='app']) *::-webkit-scrollbar-thumb {
+  background-color: var(--color-zinc-800);
 }
 
 /* Lenis (scroll suave), CSS recomendado pela biblioteca. */

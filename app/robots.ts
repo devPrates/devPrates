@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // /dashboard já fica bloqueado para quando a área logada existir.
-      disallow: ['/api/', '/dashboard'],
+      // Área restrita e telas de acesso ficam fora dos buscadores.
+      disallow: ['/api/', '/dashboard', '/login', '/cadastro'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   }
