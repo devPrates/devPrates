@@ -15,6 +15,12 @@ export type ShapeName =
   | 'ring'
   | 'trail'
   | 'support'
+  // Avatar de partículas animado (skinned-shape.ts). O gerador aqui é só a
+  // reserva enquanto o modelo carrega.
+  | 'boxer'
+  | 'bower'
+  | 'warmer'
+  | 'caller'
 
 // Gerador pseudoaleatório com semente: as formas saem iguais a cada visita.
 function random(seed: number) {
@@ -943,6 +949,10 @@ const GENERATORS: Record<
   ring,
   trail,
   support,
+  boxer: coder,
+  bower: coder,
+  warmer: coder,
+  caller: support,
 }
 
 export function buildShapes(count: number) {

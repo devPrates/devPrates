@@ -6,8 +6,8 @@ import { DashLine } from '../motion/dash-line'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
-// Como eu trabalho: 4 etapas à esquerda; à direita as partículas viram uma
-// trilha ligando 4 marcos até a bandeira de chegada.
+// Como eu trabalho: 4 etapas à esquerda; à direita as partículas viram o
+// avatar se aquecendo, que depois vira o modelo 3D.
 export function Process({ process }: { process: HomeData['process'] }) {
 
   return (

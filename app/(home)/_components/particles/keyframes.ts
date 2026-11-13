@@ -34,24 +34,22 @@ export const SCENE_POSES = {
     anchor: '[data-particles-anchor="hero"]',
   },
   manifesto: {
-    // Engrenagem encaixada na coluna do meio, entre os dois textos.
-    shape: 'gear',
+    // O avatar em partículas fazendo uma reverência (bow do Tripo), no
+    // centro da seção, entre as duas colunas de texto.
+    shape: 'bower',
     x: 0,
-    y: 0,
-    size: 0.42,
-    rot: [0, 0, 0],
+    y: -0.02,
+    size: 0.74,
+    rot: [-0.05, -0.12, 0],
     opacity: 0.95,
-    roll: 0.3,
-    anchor: '[data-particles-anchor="manifesto"]',
   },
   services: {
-    // Dev (estilo avatar do hero) no notebook cercado de linguagens.
-    // Sem giro: de costas as etiquetas apareceriam espelhadas.
-    shape: 'coder',
+    // O avatar do hero em partículas, lutando boxe (animação box_02 do Tripo).
+    shape: 'boxer',
     x: 0.2,
     y: 0,
-    size: 0.74,
-    rot: [-0.08, -0.25, 0],
+    size: 0.8,
+    rot: [-0.06, -0.45, 0],
     opacity: 0.95,
   },
   specs: {
@@ -82,22 +80,24 @@ export const SCENE_POSES = {
     spin: 0.35,
   },
   process: {
-    // Trilha com as 4 etapas, à direita da lista.
-    shape: 'trail',
-    x: 0.25,
+    // O avatar em partículas se aquecendo (warm_up do Tripo), à direita da
+    // lista de etapas; depois vira o modelo 3D.
+    shape: 'warmer',
+    x: 0.22,
     y: 0,
-    size: 0.78,
-    rot: [-0.1, -0.3, 0],
+    size: 0.8,
+    rot: [-0.06, -0.35, 0],
     opacity: 0.95,
   },
   contact: {
-    // Prates de headset no atendimento, cercado dos canais de contato.
-    // Sem giro: de costas os balões apareceriam espelhados.
-    shape: 'support',
-    x: 0.22,
+    // O avatar do hero em partículas fazendo uma ligação (make_a_call_02
+    // do Tripo), que depois vira o modelo 3D.
+    // À esquerda, virado para o texto à direita.
+    shape: 'caller',
+    x: -0.22,
     y: 0,
-    size: 0.76,
-    rot: [-0.06, -0.28, 0],
+    size: 0.8,
+    rot: [-0.06, 0.35, 0],
     opacity: 0.95,
   },
   // Fim da página: as partículas voltam a ser o PRATES, agora o do rodapé.

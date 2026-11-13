@@ -9,8 +9,8 @@ import { FlipText } from '../motion/flip-text'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
 
-// Contato: texto e botões à esquerda; à direita as partículas viram uma
-// pessoa falando num telefone de disco. O formulário abre num modal e o
+// Contato: à esquerda as partículas viram o avatar fazendo uma ligação (e
+// depois o modelo 3D); texto e botões à direita. O formulário abre num modal e o
 // WhatsApp vai direto para a conversa (o número vem da env, no servidor).
 export function Contact({
   contact,
@@ -28,6 +28,9 @@ export function Contact({
       data-scene="contact"
       className="frame relative z-10 grid min-h-svh items-center gap-16 py-32 lg:grid-cols-2"
     >
+      {/* coluna do avatar de partículas (vem do canvas) */}
+      <div aria-hidden className="hidden lg:block" />
+
       <div>
         <p className="label mb-6 text-gold-bright">
           <ScrambleText>{contact.eyebrow}</ScrambleText>
@@ -78,8 +81,6 @@ export function Contact({
           <FlipText>{contact.email}</FlipText>
         </a>
       </div>
-
-      <div aria-hidden className="hidden lg:block" />
 
       <ContactModal open={open} onClose={close} />
     </section>

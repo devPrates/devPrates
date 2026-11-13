@@ -5,8 +5,9 @@ import { useEffect, useRef } from 'react'
 import { cn } from '@/app/lib/utils'
 import { useIntro } from '../motion/intro'
 
-// Avatar 3D do hero. O three.js só é baixado no navegador (import dinâmico)
-// e o avatar só nasce depois da abertura, para o primeiro tchau ser visto.
+// Avatar 3D do hero (public/3D/prates-avatar.glb, com esqueleto) fazendo o
+// coração em loop. three.js, GSAP e o modelo só são baixados no navegador
+// (import dinâmico), e o avatar só nasce depois da abertura.
 export function HeroAvatar({ className }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const { done } = useIntro()
@@ -17,11 +18,11 @@ export function HeroAvatar({ className }: { className?: string }) {
     let destroy: (() => void) | undefined
     let cancelled = false
 
-    import('./create-devprates-avatar')
-      .then(({ createDevpratesAvatar }) => {
+    import('./create-glb-avatar')
+      .then(({ createGlbAvatar }) => {
         if (cancelled) return
         try {
-          destroy = createDevpratesAvatar(container).destroy
+          destroy = createGlbAvatar(container).destroy
         } catch {
           // Sem WebGL: a coluna fica vazia e o hero continua inteiro.
         }
@@ -37,7 +38,6 @@ export function HeroAvatar({ className }: { className?: string }) {
   return (
     <motion.div
       ref={ref}
-      data-cursor
       className={cn('relative w-full', className)}
       initial={{ opacity: 0, y: 40 }}
       animate={done ? { opacity: 1, y: 0 } : undefined}

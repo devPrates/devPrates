@@ -4,9 +4,36 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { easing } from 'maath'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { PORTRAIT_POSES, SCENE_POSES, SceneKey, ScenePose } from './keyframes'
 import { fragmentShader, vertexShader } from './shaders'
 import { buildDust, buildRandoms, buildShapes } from './shapes'
+import { BOW_URL, BOX_URL, CALL_URL, WARMUP_URL } from '../avatar/rig'
+import { loadSkinnedShape, type SkinnedShape } from './skinned-shape'
+
+const MOUSE_FORCE = 0.28
+
+// Formas "vivas": o avatar riggado em partículas fazendo uma animação, que
+// depois de assentar vira o modelo 3D de verdade.
+// hold: segundos com o boneco de partículas na tela antes de virar o modelo
+// sólido. O contato é uma seção curta (o scroll passa rápido): troca antes.
+const FIGURES = [
+  { shape: 'bower', anim: BOW_URL, hold: 0.4 }, // sobre: reverência
+  { shape: 'boxer', anim: BOX_URL, hold: 0.6 }, // serviços: lutando boxe
+  { shape: 'warmer', anim: WARMUP_URL, hold: 0.4 }, // processo: aquecimento
+  { shape: 'caller', anim: CALL_URL, hold: 0.2 }, // contato: fazendo uma ligação
+] as const
+
+type Figure = {
+  shape: (typeof FIGURES)[number]['shape']
+  live: SkinnedShape | null
+  materials: THREE.Material[]
+  // Relógio da animação: só anda enquanto a figura está na tela.
+  time: number
+  // 0..1: quanto do modelo sólido está aparecendo.
+  solid: number
+  settledAt: number
+}
 
 const lerp = THREE.MathUtils.lerp
 
@@ -50,7 +77,7 @@ function makeMaterial(size: number) {
       uPixelRatio: { value: 1 },
       uMouse: { value: new THREE.Vector2(99, 99) },
       uMouseRadius: { value: 0.55 },
-      uMouseForce: { value: 0.28 },
+      uMouseForce: { value: MOUSE_FORCE },
       uScroll: { value: 0 },
       uWrap: { value: 0 },
       uOpacity: { value: 1 },
@@ -90,6 +117,71 @@ function Field({ count }: { count: number }) {
   })
 
   const shapes = useMemo(() => buildShapes(count), [count])
+
+  // Bonecos de partículas: carregam o avatar e a animação em segundo plano.
+  // Até lá, cada forma usa o desenho de reserva de shapes.ts.
+  const figures = useRef<Figure[]>(
+    FIGURES.map((f) => ({
+      shape: f.shape,
+      live: null,
+      materials: [],
+      time: 0,
+      solid: 0,
+      settledAt: -1,
+    })),
+  )
+  // Grupo dos modelos sólidos, dentro do mesmo grupo das partículas: forma
+  // em raio 1 = modelo de altura 1 escalado 2x com os pés em y = -1.
+  const figureHolder = useRef<THREE.Group>(null)
+  useEffect(() => {
+    let alive = true
+    FIGURES.forEach((def, n) => {
+      loadSkinnedShape(count, def.anim)
+        .then((shape) => {
+          if (!alive || !shape) return shape?.dispose()
+          const fig = figures.current[n]
+          fig.live = shape
+          fig.materials = []
+          shape.object.traverse((o) => {
+            const mesh = o as THREE.Mesh
+            if (!mesh.isMesh) return
+            for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+              m.opacity = 0
+              m.transparent = true
+              fig.materials.push(m)
+            }
+          })
+          shape.object.visible = false
+          figureHolder.current?.add(shape.object)
+        })
+        .catch((err) => console.warn(`[particles] ${def.shape} não carregou`, err))
+    })
+    return () => {
+      alive = false
+      for (const fig of figures.current) {
+        if (fig.live) {
+          fig.live.object.removeFromParent()
+          fig.live.dispose()
+        }
+        fig.live = null
+        fig.materials = []
+      }
+    }
+  }, [count])
+
+  // Luz e ambiente só para o modelo sólido (as partículas não usam luz).
+  const scene = useThree((st) => st.scene)
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl)
+    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    pmrem.dispose()
+    scene.environment = env
+    scene.environmentIntensity = 0.45
+    return () => {
+      scene.environment = null
+      env.dispose()
+    }
+  }, [gl, scene])
 
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry()
@@ -274,6 +366,23 @@ function Field({ count }: { count: number }) {
       posB.needsUpdate = true
     }
 
+    // Formas vivas: com o boneco na tela, as posições mudam a cada quadro.
+    for (const fig of figures.current) {
+      const live = fig.live
+      if (!live || (a.shape !== fig.shape && b.shape !== fig.shape)) continue
+      fig.time += dt
+      live.update(fig.time)
+      for (const [pose, name] of [
+        [a, 'position'],
+        [b, 'aPosB'],
+      ] as const) {
+        if (pose.shape !== fig.shape) continue
+        const attr = geometry.getAttribute(name) as THREE.BufferAttribute
+        ;(attr.array as Float32Array).set(live.positions)
+        attr.needsUpdate = true
+      }
+    }
+
     const u = material.uniforms
     u.uMorph.value = a.shape === b.shape ? 0 : k
     u.uTime.value = time
@@ -301,7 +410,49 @@ function Field({ count }: { count: number }) {
         ?.removeAttribute('data-particles-solid')
     }
     u.uSolid.value = s.tint
-    u.uOpacity.value = lerp(a.opacity, b.opacity, k) * (1 - s.fade)
+
+    // Bonecos: com as partículas assentadas num deles por um instante, o
+    // modelo 3D aparece e as partículas somem. Ao rolar, volta rápido para
+    // partículas, que então seguem a transição para a próxima forma.
+    let solidK = 0
+    let calm = 0
+    figures.current.forEach((fig, n) => {
+      const hold = FIGURES[n].hold
+      const live = fig.live
+      const w = (a.shape === fig.shape ? 1 - k : 0) + (b.shape === fig.shape ? k : 0)
+      const isSettled = !!live && w > 0.97 && Math.abs(target - s.p) < 0.04
+      if (isSettled && fig.settledAt < 0) fig.settledAt = time
+      if (!isSettled) fig.settledAt = -1
+      // Primeiro o boneco de partículas; depois de `hold` segundos parado
+      // nele, vira o modelo 3D.
+      const settledFor = fig.settledAt >= 0 ? time - fig.settledAt : 0
+      const on = settledFor > hold
+      easing.damp(fig, 'solid', on ? 1 : 0, on ? 0.2 : 0.1, dt)
+      // Antes da troca, o mouse para de empurrar as partículas: assim elas
+      // estão exatamente em cima do modelo quando ele aparece.
+      calm = Math.max(
+        calm,
+        THREE.MathUtils.smoothstep(settledFor, hold * 0.4, hold),
+        fig.solid,
+      )
+      // Preso também ao peso da cena: ao começar a rolar para fora, o sólido
+      // já vira partículas, sem ficar de fantasma na seção seguinte.
+      const raw = fig.solid * THREE.MathUtils.smoothstep(w, 0.9, 0.985)
+      const k2 = raw < 0.002 ? 0 : raw
+      solidK = Math.max(solidK, k2)
+      if (live) {
+        live.object.visible = k2 > 0
+        for (const m of fig.materials) {
+          m.opacity = k2
+          // Opaco de verdade quando inteiro: sem ver o lado de dentro do corpo.
+          m.transparent = k2 < 0.999
+          m.depthWrite = k2 > 0.5
+        }
+      }
+    })
+    u.uMouseForce.value = MOUSE_FORCE * (1 - calm)
+
+    u.uOpacity.value = lerp(a.opacity, b.opacity, k) * (1 - s.fade) * (1 - solidK)
     // Partículas maiores em telas pequenas, para não sumirem.
     u.uSize.value = canvasWidth < 700 ? 22 : 18
 
@@ -390,8 +541,13 @@ function Field({ count }: { count: number }) {
             material={material}
             frustumCulled={false}
           />
+          <group ref={figureHolder} position={[0, -1, 0]} scale={2} />
         </group>
       </group>
+      <hemisphereLight args={[0xfff4e6, 0x2a2420, 0.7]} />
+      <directionalLight position={[2, 3, 4]} intensity={2.2} color={0xfff1e0} />
+      {/* Contorno verde-água por trás, como no avatar do hero. */}
+      <directionalLight position={[-3, 2.2, -3]} intensity={3} color={0x2ec4b6} />
       <points geometry={dust} material={dustMaterial} frustumCulled={false} />
     </>
   )
@@ -419,6 +575,10 @@ export default function ParticlesScene() {
           antialias: false,
           alpha: true,
           powerPreference: 'high-performance',
+        }}
+        // Mesmo tone mapping do avatar do hero (o R3F usa ACES por padrão).
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.NeutralToneMapping
         }}
       >
         <Field count={count} />

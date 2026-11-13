@@ -47,9 +47,9 @@ export function Hero({ hero }: { hero: HomeData['hero'] }) {
       className="frame relative flex min-h-svh flex-col justify-between overflow-hidden pb-6 pt-24 sm:pt-28 lg:h-svh lg:min-h-[640px]"
     >
       {/* Tagline no topo com o PRATES logo abaixo; no desktop o avatar 3D
-          fica solto à direita, maior e afastado da borda. */}
+          fica solto à direita, em pé e de corpo inteiro. */}
       <div className="relative z-10 flex flex-1 flex-col gap-8 pb-10 lg:static lg:block lg:flex-none lg:pb-0 lg:pt-[4svh]">
-        <div className="max-lg:pt-10 lg:w-[70%]">
+        <div className="max-lg:pt-10 lg:w-[58%]">
           <h1 className="sr-only">
             Gabriel Prates, {hero.cardTitle}
           </h1>
@@ -60,7 +60,7 @@ export function Hero({ hero }: { hero: HomeData['hero'] }) {
           </p>
           <HeroWordmark play={done} />
         </div>
-        <HeroAvatar className="mx-auto aspect-[4/5] w-[min(100%,78vw,40svh)] lg:mx-0 lg:aspect-auto lg:absolute lg:z-10 lg:bottom-[9svh] lg:right-[7vw] lg:h-[min(66svh,760px)] lg:w-[min(34vw,51svh,590px)]" />
+        <HeroAvatar className="mx-auto aspect-[3/4] w-[min(100%,80vw,46svh)] lg:mx-0 lg:aspect-auto lg:absolute lg:z-10 lg:bottom-[8svh] lg:right-[6vw] lg:h-[min(80svh,900px)] lg:w-[min(34vw,62svh,640px)]" />
       </div>
 
       <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">

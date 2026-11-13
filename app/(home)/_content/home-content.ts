@@ -72,6 +72,29 @@ export const homeContent = {
     eyebrow: '01 — Sobre',
     heading: 'Não é só código.',
     body: 'É entender o processo, cortar o retrabalho e entregar algo que alguém usa todo dia. O código é só a parte que aparece.',
+    facts: [
+      { label: 'Base', value: 'Naviraí – MS' },
+      { label: 'Atuação', value: 'Programador e analista de dados' },
+      { label: 'Experiência', value: '4+ anos' },
+    ] satisfies SpecRow[],
+    principlesTitle: 'Como eu trabalho',
+    principles: [
+      {
+        index: '01',
+        title: 'Entender antes de codar',
+        body: 'Vejo o processo de perto e converso com quem usa antes de desenhar qualquer tela.',
+      },
+      {
+        index: '02',
+        title: 'Cortar o retrabalho',
+        body: 'O que se repete vira automação; o que está espalhado em planilha vira um lugar só.',
+      },
+      {
+        index: '03',
+        title: 'Entregar e acompanhar',
+        body: 'Sistema no ar é o começo: ajusto com o uso e dou suporte depois da entrega.',
+      },
+    ] satisfies ProcessStep[],
   },
 
   services: {
