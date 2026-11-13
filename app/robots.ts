@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Área restrita e telas de acesso ficam fora dos buscadores.
-      disallow: ['/api/', '/dashboard', '/login', '/cadastro'],
+      disallow: ['/api/', '/dashboard', '/login'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   }

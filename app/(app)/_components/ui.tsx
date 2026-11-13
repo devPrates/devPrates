@@ -90,7 +90,7 @@ export function FormError({ message }: { message?: string }) {
   )
 }
 
-// Moldura das telas de login e cadastro: cartão centralizado.
+// Moldura da tela de login: cartão centralizado.
 export function AuthShell({
   title,
   description,
