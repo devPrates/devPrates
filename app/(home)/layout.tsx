@@ -9,7 +9,8 @@ import { Footer } from './_components/shell/footer'
 import { Nav } from './_components/shell/nav'
 import { SideLabel } from './_components/shell/side-label'
 
-// Shell da home nova (tema Prates). As páginas antigas usam app/(legacy).
+// Shell da home (tema Prates). Páginas internas usam app/(pages); o
+// currículo ainda usa app/(legacy).
 export default function HomeLayout({ children }: { children: ReactNode }) {
   return (
     <div data-theme="prates" className="relative bg-walnut text-cream">

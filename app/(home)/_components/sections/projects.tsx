@@ -2,8 +2,6 @@
 
 import {
   motion,
-  MotionValue,
-  useInView,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -11,7 +9,6 @@ import {
   useTransform,
   useVelocity,
 } from 'motion/react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { HiArrowNarrowRight } from 'react-icons/hi'
@@ -20,13 +17,10 @@ import {
   homeContent,
   ProjectHighlight,
 } from '../../_content/home-content'
-import { DashLine } from '../motion/dash-line'
 import { FlipText } from '../motion/flip-text'
 import { ScrambleText } from '../motion/scramble-text'
 import { SplitReveal } from '../motion/split-reveal'
-
-const ease = [0.76, 0, 0.24, 1] as const
-const easeOut = [0.16, 1, 0.3, 1] as const
+import { ProjectCard } from '../project-card'
 
 // Galeria horizontal: a seção trava na tela e o scroll vertical vira
 // movimento lateral da faixa de projetos (1px de scroll = 1px de faixa).
@@ -141,6 +135,17 @@ export function Projects({ items }: { items: ProjectHighlight[] }) {
               total={total}
               skew={skew}
               parallax={parallax}
+              priority={i < 2}
+              // Alterna formato e altura para a faixa ter ritmo.
+              className={cn(
+                'w-[82vw] shrink-0 snap-start',
+                i % 2 === 0
+                  ? 'md:w-[44.8vh] md:self-center'
+                  : 'md:mt-[14vh] md:w-[64vh]',
+              )}
+              mediaClassName={
+                i % 2 === 0 ? 'aspect-[4/5]' : 'aspect-[4/5] md:aspect-[16/11]'
+              }
             />
           ))}
 
@@ -181,128 +186,5 @@ export function Projects({ items }: { items: ProjectHighlight[] }) {
         )}
       </div>
     </section>
-  )
-}
-
-function ProjectCard({
-  project,
-  index,
-  total,
-  skew,
-  parallax,
-}: {
-  project: ProjectHighlight
-  index: number
-  total: number
-  skew: MotionValue<number>
-  parallax: MotionValue<string>
-}) {
-  // Alterna formato e altura para a faixa ter ritmo.
-  const tall = index % 2 === 0
-  const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0 })
-  // A imagem nunca pode ficar escondida: começa visível (SSR e sem JS), só
-  // fecha a cortina se o card ainda estiver fora da tela, e uma trava de
-  // segurança abre tudo depois de um tempo se o observer não disparar.
-  const [state, setState] = useState<'initial' | 'waiting' | 'shown'>('initial')
-  useEffect(() => {
-    if (inView) return setState('shown')
-    setState((s) => (s === 'initial' ? 'waiting' : s))
-  }, [inView])
-  useEffect(() => {
-    if (state !== 'waiting') return
-    const t = window.setTimeout(() => setState('shown'), 4000)
-    return () => window.clearTimeout(t)
-  }, [state])
-  const revealed = state !== 'waiting'
-
-  return (
-    <motion.article
-      ref={ref}
-      style={{ skewX: skew }}
-      // O gatilho fica aqui, fora do clip-path: um elemento 100% recortado
-      // conta como invisível para o IntersectionObserver e nunca dispararia.
-      initial={false}
-      animate={revealed ? 'shown' : 'hidden'}
-      className={cn(
-        'w-[82vw] shrink-0 snap-start',
-        tall ? 'md:w-[44.8vh]' : 'md:w-[64vh]',
-        tall ? 'md:self-center' : 'md:mt-[14vh]',
-      )}
-    >
-      <Link
-        href={`/projects/${project.slug}`}
-        className="group block"
-        data-cursor
-      >
-        <motion.div
-          className={cn(
-            'relative overflow-hidden rounded-card bg-bark',
-            tall ? 'aspect-[4/5]' : 'aspect-[4/5] md:aspect-[16/11]',
-          )}
-          variants={{
-            hidden: { clipPath: 'inset(0% 0% 0% 100%)' },
-            shown: { clipPath: 'inset(0% 0% 0% 0%)' },
-          }}
-          transition={{ duration: 1.3, ease }}
-        >
-          <motion.div
-            className="absolute -inset-x-[12%] inset-y-0"
-            style={{ x: parallax }}
-          >
-            <motion.div
-              className="relative size-full"
-              variants={{ hidden: { scale: 1.35 }, shown: { scale: 1 } }}
-              transition={{ duration: 1.8, ease: easeOut }}
-            >
-              <Image
-                src={project.thumbnail}
-                alt={`Projeto ${project.title}`}
-                fill
-                sizes="(min-width: 768px) 45vw, 82vw"
-                priority={index < 2}
-                className="object-cover transition-[transform,filter] duration-[1.2s] ease-out-expo group-hover:scale-[1.06] group-hover:brightness-75"
-              />
-            </motion.div>
-          </motion.div>
-
-          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-walnut/80 via-transparent to-walnut/30" />
-
-          <span className="pointer-events-none absolute left-5 top-4 text-[72px] font-medium leading-none text-transparent [-webkit-text-stroke:1px_rgba(255,237,215,0.55)] md:text-[clamp(72px,7vw,128px)]">
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          <span className="label absolute right-5 top-5 text-cream/70">
-            {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-          </span>
-
-          <span className="label absolute bottom-5 right-5 inline-flex translate-y-3 items-center gap-2 rounded-ghost bg-cream px-4 py-2 text-walnut opacity-0 transition-all duration-500 ease-out-expo group-hover:translate-y-0 group-hover:opacity-100">
-            Ver projeto <HiArrowNarrowRight />
-          </span>
-        </motion.div>
-
-        <DashLine className="mt-5" delay={0.3} />
-        <div className="mt-4 flex items-baseline justify-between gap-6">
-          <h3 className="line-clamp-2 text-heading-sm font-medium uppercase leading-tight">
-            <FlipText>{project.title}</FlipText>
-          </h3>
-          <span className="label shrink-0 text-driftwood">
-            {project.category} · {project.year}
-          </span>
-        </div>
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-cream/70">
-          {project.summary}
-        </p>
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {project.stack.map((tag) => (
-            <li
-              key={tag}
-              className="label rounded-ghost border border-cork px-3 py-1 text-cream/70"
-            >
-              {tag}
-            </li>
-          ))}
-        </ul>
-      </Link>
-    </motion.article>
   )
 }

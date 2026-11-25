@@ -11,8 +11,11 @@ import {
   SpecCounter,
   SpecRow,
 } from './home-content'
-
-type Category = 'SISTEMA_WEB' | 'SITE' | 'ENSINO'
+import {
+  PROJECT_CARD_FIELDS,
+  ProjectCardQuery,
+  toProjectHighlight,
+} from './get-projects'
 
 type PageQuery = {
   profilePicture: { url: string } | null
@@ -37,15 +40,7 @@ type PageQuery = {
 
 type HomeQuery = {
   page: PageQuery | null
-  projects: {
-    slug: string
-    title: string
-    shortDescription: string
-    createdAt: string
-    category: Category | null
-    thumbnail: { url: string } | null
-    technologies: { name: string }[]
-  }[]
+  projects: ProjectCardQuery[]
   projectsConnection: { aggregate: { count: number } }
   workExperiences: {
     role: string
@@ -82,13 +77,7 @@ const HOME_QUERY = `
       processSteps { title body }
     }
     projects(first: 6, orderBy: createdAt_DESC) {
-      slug
-      title
-      shortDescription
-      createdAt
-      category
-      thumbnail { url }
-      technologies { name }
+      ${PROJECT_CARD_FIELDS}
     }
     projectsConnection { aggregate { count } }
     workExperiences(orderBy: startDate_DESC) {
@@ -101,12 +90,6 @@ const HOME_QUERY = `
     technologies(first: 100) { startDate }
   }
 `
-
-const CATEGORY_LABEL: Record<Category, string> = {
-  SISTEMA_WEB: 'Sistema web',
-  SITE: 'Site',
-  ENSINO: 'Ensino',
-}
 
 // Numeração dos itens (01, 02...): é layout, não vem do CMS.
 const indexOf = (i: number) => String(i + 1).padStart(2, '0')
@@ -150,15 +133,7 @@ function periodOf(start: string | null, end: string | null) {
 
 function toProjects(data: HomeQuery): ProjectHighlight[] {
   if (!data.projects?.length) return homeContent.projects.items
-  return data.projects.map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    category: p.category ? CATEGORY_LABEL[p.category] : 'Projeto',
-    year: p.createdAt.slice(0, 4),
-    thumbnail: p.thumbnail?.url ?? '',
-    summary: p.shortDescription,
-    stack: p.technologies.slice(0, 4).map((t) => t.name),
-  }))
+  return data.projects.map((p) => toProjectHighlight(p))
 }
 
 function toExperience(data: HomeQuery): Experience[] {
