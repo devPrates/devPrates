@@ -1,0 +1,1836 @@
+{
+  "id": "ff126246-a8b9-4149-ab74-056ff037b165",
+  "prevId": "4755a346-04b9-41da-b2d9-0b872da24a16",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "finance.accounts": {
+      "name": "accounts",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "institution": {
+          "name": "institution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "account_kind",
+          "typeSchema": "finance",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opening_balance_cents": {
+          "name": "opening_balance_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "limit_cents": {
+          "name": "limit_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "closing_day": {
+          "name": "closing_day",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "due_day": {
+          "name": "due_day",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "accounts_name_not_blank": {
+          "name": "accounts_name_not_blank",
+          "value": "btrim(\"finance\".\"accounts\".\"name\") <> ''"
+        },
+        "accounts_fields_by_kind": {
+          "name": "accounts_fields_by_kind",
+          "value": "case when \"finance\".\"accounts\".\"kind\" = 'credito'\n        then \"finance\".\"accounts\".\"opening_balance_cents\" is null\n          and \"finance\".\"accounts\".\"closing_day\" is not null and \"finance\".\"accounts\".\"closing_day\" between 1 and 31\n          and \"finance\".\"accounts\".\"due_day\" is not null and \"finance\".\"accounts\".\"due_day\" between 1 and 31\n          and (\"finance\".\"accounts\".\"limit_cents\" is null or \"finance\".\"accounts\".\"limit_cents\" >= 0)\n        else \"finance\".\"accounts\".\"opening_balance_cents\" is not null\n          and num_nonnulls(\"finance\".\"accounts\".\"limit_cents\", \"finance\".\"accounts\".\"closing_day\", \"finance\".\"accounts\".\"due_day\") = 0\n        end"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.cash_entries": {
+      "name": "cash_entries",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "direction": {
+          "name": "direction",
+          "type": "cash_direction",
+          "typeSchema": "finance",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "cash_entries_date_idx": {
+          "name": "cash_entries_date_idx",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "cash_entries_category_idx": {
+          "name": "cash_entries_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "cash_entries_account_idx": {
+          "name": "cash_entries_account_idx",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "cash_entries_category_id_categories_id_fk": {
+          "name": "cash_entries_category_id_categories_id_fk",
+          "tableFrom": "cash_entries",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "tableTo": "categories",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "cash_entries_account_id_accounts_id_fk": {
+          "name": "cash_entries_account_id_accounts_id_fk",
+          "tableFrom": "cash_entries",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "cash_entries_description_not_blank": {
+          "name": "cash_entries_description_not_blank",
+          "value": "btrim(\"finance\".\"cash_entries\".\"description\") <> ''"
+        },
+        "cash_entries_amount_positive": {
+          "name": "cash_entries_amount_positive",
+          "value": "\"finance\".\"cash_entries\".\"amount_cents\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.cash_entry_tags": {
+      "name": "cash_entry_tags",
+      "schema": "finance",
+      "columns": {
+        "cash_entry_id": {
+          "name": "cash_entry_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "cash_entry_tags_tag_idx": {
+          "name": "cash_entry_tags_tag_idx",
+          "columns": [
+            {
+              "expression": "tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "cash_entry_tags_cash_entry_id_cash_entries_id_fk": {
+          "name": "cash_entry_tags_cash_entry_id_cash_entries_id_fk",
+          "tableFrom": "cash_entry_tags",
+          "columnsFrom": [
+            "cash_entry_id"
+          ],
+          "tableTo": "cash_entries",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "cash_entry_tags_tag_id_tags_id_fk": {
+          "name": "cash_entry_tags_tag_id_tags_id_fk",
+          "tableFrom": "cash_entry_tags",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "tableTo": "tags",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "cash_entry_tags_cash_entry_id_tag_id_pk": {
+          "name": "cash_entry_tags_cash_entry_id_tag_id_pk",
+          "columns": [
+            "cash_entry_id",
+            "tag_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "finance.categories": {
+      "name": "categories",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "category_kind",
+          "typeSchema": "finance",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "system_key": {
+          "name": "system_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "categories_kind_name_key": {
+          "name": "categories_kind_name_key",
+          "columns": [
+            {
+              "expression": "kind",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(\"name\")",
+              "isExpression": true,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "categories_system_key_unique": {
+          "name": "categories_system_key_unique",
+          "columns": [
+            "system_key"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "categories_name_not_blank": {
+          "name": "categories_name_not_blank",
+          "value": "btrim(\"finance\".\"categories\".\"name\") <> ''"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.credit_purchase_tags": {
+      "name": "credit_purchase_tags",
+      "schema": "finance",
+      "columns": {
+        "credit_purchase_id": {
+          "name": "credit_purchase_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "credit_purchase_tags_tag_idx": {
+          "name": "credit_purchase_tags_tag_idx",
+          "columns": [
+            {
+              "expression": "tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "credit_purchase_tags_credit_purchase_id_credit_purchases_id_fk": {
+          "name": "credit_purchase_tags_credit_purchase_id_credit_purchases_id_fk",
+          "tableFrom": "credit_purchase_tags",
+          "columnsFrom": [
+            "credit_purchase_id"
+          ],
+          "tableTo": "credit_purchases",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "credit_purchase_tags_tag_id_tags_id_fk": {
+          "name": "credit_purchase_tags_tag_id_tags_id_fk",
+          "tableFrom": "credit_purchase_tags",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "tableTo": "tags",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "credit_purchase_tags_credit_purchase_id_tag_id_pk": {
+          "name": "credit_purchase_tags_credit_purchase_id_tag_id_pk",
+          "columns": [
+            "credit_purchase_id",
+            "tag_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "finance.credit_purchases": {
+      "name": "credit_purchases",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "purchase_kind",
+          "typeSchema": "finance",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'compra'"
+        },
+        "credit_account_id": {
+          "name": "credit_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_cents": {
+          "name": "total_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "installments": {
+          "name": "installments",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_installment": {
+          "name": "first_installment",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "first_invoice_month": {
+          "name": "first_invoice_month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "credit_purchases_date_idx": {
+          "name": "credit_purchases_date_idx",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "credit_purchases_category_idx": {
+          "name": "credit_purchases_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "credit_purchases_account_idx": {
+          "name": "credit_purchases_account_idx",
+          "columns": [
+            {
+              "expression": "credit_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "credit_purchases_credit_account_id_accounts_id_fk": {
+          "name": "credit_purchases_credit_account_id_accounts_id_fk",
+          "tableFrom": "credit_purchases",
+          "columnsFrom": [
+            "credit_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "credit_purchases_category_id_categories_id_fk": {
+          "name": "credit_purchases_category_id_categories_id_fk",
+          "tableFrom": "credit_purchases",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "tableTo": "categories",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "credit_purchases_description_not_blank": {
+          "name": "credit_purchases_description_not_blank",
+          "value": "btrim(\"finance\".\"credit_purchases\".\"description\") <> ''"
+        },
+        "credit_purchases_total_positive": {
+          "name": "credit_purchases_total_positive",
+          "value": "\"finance\".\"credit_purchases\".\"total_cents\" > 0"
+        },
+        "credit_purchases_installments_valid": {
+          "name": "credit_purchases_installments_valid",
+          "value": "\"finance\".\"credit_purchases\".\"first_installment\" >= 1 and \"finance\".\"credit_purchases\".\"first_installment\" <= \"finance\".\"credit_purchases\".\"installments\""
+        },
+        "credit_purchases_invoice_month": {
+          "name": "credit_purchases_invoice_month",
+          "value": "extract(day from \"finance\".\"credit_purchases\".\"first_invoice_month\") = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.invoice_payments": {
+      "name": "invoice_payments",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "credit_account_id": {
+          "name": "credit_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invoice_month": {
+          "name": "invoice_month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "paid_at": {
+          "name": "paid_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "paid_from_account_id": {
+          "name": "paid_from_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "invoice_payments_paid_at_idx": {
+          "name": "invoice_payments_paid_at_idx",
+          "columns": [
+            {
+              "expression": "paid_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "invoice_payments_paid_from_idx": {
+          "name": "invoice_payments_paid_from_idx",
+          "columns": [
+            {
+              "expression": "paid_from_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "invoice_payments_credit_account_id_accounts_id_fk": {
+          "name": "invoice_payments_credit_account_id_accounts_id_fk",
+          "tableFrom": "invoice_payments",
+          "columnsFrom": [
+            "credit_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "invoice_payments_paid_from_account_id_accounts_id_fk": {
+          "name": "invoice_payments_paid_from_account_id_accounts_id_fk",
+          "tableFrom": "invoice_payments",
+          "columnsFrom": [
+            "paid_from_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "invoice_payments_account_month_key": {
+          "name": "invoice_payments_account_month_key",
+          "columns": [
+            "credit_account_id",
+            "invoice_month"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "invoice_payments_amount_positive": {
+          "name": "invoice_payments_amount_positive",
+          "value": "\"finance\".\"invoice_payments\".\"amount_cents\" > 0"
+        },
+        "invoice_payments_month": {
+          "name": "invoice_payments_month",
+          "value": "extract(day from \"finance\".\"invoice_payments\".\"invoice_month\") = 1"
+        },
+        "invoice_payments_distinct_accounts": {
+          "name": "invoice_payments_distinct_accounts",
+          "value": "\"finance\".\"invoice_payments\".\"credit_account_id\" <> \"finance\".\"invoice_payments\".\"paid_from_account_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.loans": {
+      "name": "loans",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "credit_account_id": {
+          "name": "credit_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deposit_account_id": {
+          "name": "deposit_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "received_at": {
+          "name": "received_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "principal_cents": {
+          "name": "principal_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "installment_amount_cents": {
+          "name": "installment_amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "installments": {
+          "name": "installments",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_installment": {
+          "name": "first_installment",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "first_invoice_month": {
+          "name": "first_invoice_month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "loans_received_at_idx": {
+          "name": "loans_received_at_idx",
+          "columns": [
+            {
+              "expression": "received_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "loans_credit_account_idx": {
+          "name": "loans_credit_account_idx",
+          "columns": [
+            {
+              "expression": "credit_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "loans_deposit_account_idx": {
+          "name": "loans_deposit_account_idx",
+          "columns": [
+            {
+              "expression": "deposit_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "loans_credit_account_id_accounts_id_fk": {
+          "name": "loans_credit_account_id_accounts_id_fk",
+          "tableFrom": "loans",
+          "columnsFrom": [
+            "credit_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "loans_deposit_account_id_accounts_id_fk": {
+          "name": "loans_deposit_account_id_accounts_id_fk",
+          "tableFrom": "loans",
+          "columnsFrom": [
+            "deposit_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "loans_description_not_blank": {
+          "name": "loans_description_not_blank",
+          "value": "btrim(\"finance\".\"loans\".\"description\") <> ''"
+        },
+        "loans_principal_positive": {
+          "name": "loans_principal_positive",
+          "value": "\"finance\".\"loans\".\"principal_cents\" > 0"
+        },
+        "loans_installment_amount_positive": {
+          "name": "loans_installment_amount_positive",
+          "value": "\"finance\".\"loans\".\"installment_amount_cents\" > 0"
+        },
+        "loans_installments_valid": {
+          "name": "loans_installments_valid",
+          "value": "\"finance\".\"loans\".\"first_installment\" >= 1 and \"finance\".\"loans\".\"first_installment\" <= \"finance\".\"loans\".\"installments\""
+        },
+        "loans_invoice_month": {
+          "name": "loans_invoice_month",
+          "value": "extract(day from \"finance\".\"loans\".\"first_invoice_month\") = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.payable_tags": {
+      "name": "payable_tags",
+      "schema": "finance",
+      "columns": {
+        "payable_id": {
+          "name": "payable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "payable_tags_tag_idx": {
+          "name": "payable_tags_tag_idx",
+          "columns": [
+            {
+              "expression": "tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "payable_tags_payable_id_payables_id_fk": {
+          "name": "payable_tags_payable_id_payables_id_fk",
+          "tableFrom": "payable_tags",
+          "columnsFrom": [
+            "payable_id"
+          ],
+          "tableTo": "payables",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "payable_tags_tag_id_tags_id_fk": {
+          "name": "payable_tags_tag_id_tags_id_fk",
+          "tableFrom": "payable_tags",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "tableTo": "tags",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "payable_tags_payable_id_tag_id_pk": {
+          "name": "payable_tags_payable_id_tag_id_pk",
+          "columns": [
+            "payable_id",
+            "tag_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "finance.payables": {
+      "name": "payables",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "supplier": {
+          "name": "supplier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_at": {
+          "name": "settled_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_account_id": {
+          "name": "settled_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_amount_cents": {
+          "name": "settled_amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "payables_due_date_idx": {
+          "name": "payables_due_date_idx",
+          "columns": [
+            {
+              "expression": "due_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "payables_settled_at_idx": {
+          "name": "payables_settled_at_idx",
+          "columns": [
+            {
+              "expression": "settled_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "payables_category_idx": {
+          "name": "payables_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "payables_settled_account_idx": {
+          "name": "payables_settled_account_idx",
+          "columns": [
+            {
+              "expression": "settled_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "payables_category_id_categories_id_fk": {
+          "name": "payables_category_id_categories_id_fk",
+          "tableFrom": "payables",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "tableTo": "categories",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "payables_settled_account_id_accounts_id_fk": {
+          "name": "payables_settled_account_id_accounts_id_fk",
+          "tableFrom": "payables",
+          "columnsFrom": [
+            "settled_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "payables_description_not_blank": {
+          "name": "payables_description_not_blank",
+          "value": "btrim(\"finance\".\"payables\".\"description\") <> ''"
+        },
+        "payables_amount_positive": {
+          "name": "payables_amount_positive",
+          "value": "\"finance\".\"payables\".\"amount_cents\" > 0"
+        },
+        "payables_settlement_complete": {
+          "name": "payables_settlement_complete",
+          "value": "num_nonnulls(\"finance\".\"payables\".\"settled_at\", \"finance\".\"payables\".\"settled_account_id\", \"finance\".\"payables\".\"settled_amount_cents\") in (0, 3)"
+        },
+        "payables_settled_amount_positive": {
+          "name": "payables_settled_amount_positive",
+          "value": "\"finance\".\"payables\".\"settled_amount_cents\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.receivable_tags": {
+      "name": "receivable_tags",
+      "schema": "finance",
+      "columns": {
+        "receivable_id": {
+          "name": "receivable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "receivable_tags_tag_idx": {
+          "name": "receivable_tags_tag_idx",
+          "columns": [
+            {
+              "expression": "tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "receivable_tags_receivable_id_receivables_id_fk": {
+          "name": "receivable_tags_receivable_id_receivables_id_fk",
+          "tableFrom": "receivable_tags",
+          "columnsFrom": [
+            "receivable_id"
+          ],
+          "tableTo": "receivables",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "receivable_tags_tag_id_tags_id_fk": {
+          "name": "receivable_tags_tag_id_tags_id_fk",
+          "tableFrom": "receivable_tags",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "tableTo": "tags",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "receivable_tags_receivable_id_tag_id_pk": {
+          "name": "receivable_tags_receivable_id_tag_id_pk",
+          "columns": [
+            "receivable_id",
+            "tag_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "finance.receivables": {
+      "name": "receivables",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer": {
+          "name": "customer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_at": {
+          "name": "settled_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_account_id": {
+          "name": "settled_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "settled_amount_cents": {
+          "name": "settled_amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "receivables_due_date_idx": {
+          "name": "receivables_due_date_idx",
+          "columns": [
+            {
+              "expression": "due_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "receivables_settled_at_idx": {
+          "name": "receivables_settled_at_idx",
+          "columns": [
+            {
+              "expression": "settled_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "receivables_category_idx": {
+          "name": "receivables_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "receivables_settled_account_idx": {
+          "name": "receivables_settled_account_idx",
+          "columns": [
+            {
+              "expression": "settled_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "receivables_category_id_categories_id_fk": {
+          "name": "receivables_category_id_categories_id_fk",
+          "tableFrom": "receivables",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "tableTo": "categories",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "receivables_settled_account_id_accounts_id_fk": {
+          "name": "receivables_settled_account_id_accounts_id_fk",
+          "tableFrom": "receivables",
+          "columnsFrom": [
+            "settled_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "receivables_description_not_blank": {
+          "name": "receivables_description_not_blank",
+          "value": "btrim(\"finance\".\"receivables\".\"description\") <> ''"
+        },
+        "receivables_amount_positive": {
+          "name": "receivables_amount_positive",
+          "value": "\"finance\".\"receivables\".\"amount_cents\" > 0"
+        },
+        "receivables_settlement_complete": {
+          "name": "receivables_settlement_complete",
+          "value": "num_nonnulls(\"finance\".\"receivables\".\"settled_at\", \"finance\".\"receivables\".\"settled_account_id\", \"finance\".\"receivables\".\"settled_amount_cents\") in (0, 3)"
+        },
+        "receivables_settled_amount_positive": {
+          "name": "receivables_settled_amount_positive",
+          "value": "\"finance\".\"receivables\".\"settled_amount_cents\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.tags": {
+      "name": "tags",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "tags_name_key": {
+          "name": "tags_name_key",
+          "columns": [
+            {
+              "expression": "lower(\"name\")",
+              "isExpression": true,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "tags_name_not_blank": {
+          "name": "tags_name_not_blank",
+          "value": "btrim(\"finance\".\"tags\".\"name\") <> ''"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "finance.transfers": {
+      "name": "transfers",
+      "schema": "finance",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_account_id": {
+          "name": "from_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to_account_id": {
+          "name": "to_account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "transfers_date_idx": {
+          "name": "transfers_date_idx",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "transfers_from_account_idx": {
+          "name": "transfers_from_account_idx",
+          "columns": [
+            {
+              "expression": "from_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "transfers_to_account_idx": {
+          "name": "transfers_to_account_idx",
+          "columns": [
+            {
+              "expression": "to_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "transfers_from_account_id_accounts_id_fk": {
+          "name": "transfers_from_account_id_accounts_id_fk",
+          "tableFrom": "transfers",
+          "columnsFrom": [
+            "from_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "transfers_to_account_id_accounts_id_fk": {
+          "name": "transfers_to_account_id_accounts_id_fk",
+          "tableFrom": "transfers",
+          "columnsFrom": [
+            "to_account_id"
+          ],
+          "tableTo": "accounts",
+          "schemaTo": "finance",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "transfers_amount_positive": {
+          "name": "transfers_amount_positive",
+          "value": "\"finance\".\"transfers\".\"amount_cents\" > 0"
+        },
+        "transfers_distinct_accounts": {
+          "name": "transfers_distinct_accounts",
+          "value": "\"finance\".\"transfers\".\"from_account_id\" <> \"finance\".\"transfers\".\"to_account_id\""
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "finance.account_kind": {
+      "name": "account_kind",
+      "schema": "finance",
+      "values": [
+        "corrente",
+        "carteira",
+        "poupanca",
+        "credito"
+      ]
+    },
+    "finance.cash_direction": {
+      "name": "cash_direction",
+      "schema": "finance",
+      "values": [
+        "entrada",
+        "saida"
+      ]
+    },
+    "finance.category_kind": {
+      "name": "category_kind",
+      "schema": "finance",
+      "values": [
+        "despesa",
+        "receita",
+        "neutra"
+      ]
+    },
+    "finance.purchase_kind": {
+      "name": "purchase_kind",
+      "schema": "finance",
+      "values": [
+        "compra",
+        "pix_credito"
+      ]
+    }
+  },
+  "schemas": {
+    "finance": "finance"
+  },
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

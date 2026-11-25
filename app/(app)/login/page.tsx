@@ -23,7 +23,7 @@ export default async function LoginPage({
   const { erro } = await searchParams
   const notice =
     erro === 'acesso'
-      ? 'Esta conta não tem acesso à área restrita.'
+      ? 'Este usuário não tem acesso à área restrita.'
       : undefined
 
   return (

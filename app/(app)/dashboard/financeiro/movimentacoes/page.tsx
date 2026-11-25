@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { NewButton } from '../_forms/launchers'
+import { NewButton, RowMenu } from '../_forms/launchers'
 import { cn } from '@/app/lib/utils'
-import { accountOf, moneyAccounts, monthOf, movements, parseMonth, tagOf } from '../_lib/finance'
+import { AccountLogo, AccountName } from '../_components/account-logo'
+import { getLedger } from '../_lib/data'
+import { monthOf, parseMonth } from '../_lib/dates'
+import { movementItems } from '../_lib/row-items'
 import { money, signedMoney, weekdayDate } from '../_lib/format'
 import type { Movement, MovementSource } from '../_lib/types'
 import {
@@ -10,7 +13,6 @@ import {
   EmptyState,
   MonthNav,
   PageHeader,
-  SampleDataNotice,
   StatCard,
   Tabs,
   Tag,
@@ -44,14 +46,15 @@ export default async function MovementsPage({
 }: {
   searchParams: Promise<{ mes?: string; tipo?: string; conta?: string; tag?: string }>
 }) {
+  const f = await getLedger()
   const params = await searchParams
   const month = parseMonth(params.mes)
   const type = FILTERS.some((f) => f.key === params.tipo) ? params.tipo! : 'todas'
 
-  const account = moneyAccounts().find((a) => a.id === params.conta)
-  const tag = tagOf(params.tag)
+  const account = f.moneyAccounts.find((a) => a.id === params.conta)
+  const tag = f.tagOf(params.tag)
 
-  const ofMonth = movements().filter(
+  const ofMonth = f.movements.filter(
     (mv) =>
       monthOf(mv.date) === month &&
       (!account || mv.accountId === account.id) &&
@@ -89,7 +92,7 @@ export default async function MovementsPage({
     <div className="mx-auto grid max-w-5xl gap-6">
       <PageHeader
         title="Movimentações"
-        description="O que de fato entrou e saiu das suas contas: despesas à vista, contas pagas, recebimentos, empréstimos, faturas pagas e transferências entre contas."
+        description="O que de fato entrou e saiu das suas contas bancárias e da carteira: despesas à vista, contas pagas, recebimentos, empréstimos, faturas pagas e transferências entre contas bancárias."
         actions={
           <>
             <NewButton type="despesa" label="Nova saída" />
@@ -99,21 +102,21 @@ export default async function MovementsPage({
           </>
         }
       />
-      <SampleDataNotice />
 
       <div className="flex flex-wrap gap-1.5 text-[13px]">
-        {[{ id: undefined, name: 'Todas as contas' }, ...moneyAccounts()].map((a) => (
+        {[{ id: undefined, name: 'Todos os bancos', logo: undefined }, ...f.moneyAccounts.filter((a) => !a.archived || a.id === account?.id)].map((a) => (
           <Link
             key={a.id ?? 'todas'}
             href={href({ conta: a.id ?? '' })}
             aria-current={account?.id === a.id ? 'page' : undefined}
             className={cn(
-              'rounded-full border px-3 py-1 transition-colors',
+              'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors',
               account?.id === a.id
                 ? 'border-zinc-600 bg-white/10 text-zinc-100'
                 : 'border-zinc-800 text-zinc-400 hover:text-zinc-200',
             )}
           >
+            {a.id && <AccountLogo account={a} />}
             {a.name}
           </Link>
         ))}
@@ -148,7 +151,7 @@ export default async function MovementsPage({
         <StatCard
           label="Transferido"
           value={money(transferred)}
-          hint={account ? 'enviado desta conta' : 'entre suas contas'}
+          hint={account ? 'enviado deste banco' : 'entre seus bancos'}
         />
         <StatCard
           label="Saldo do mês"
@@ -184,17 +187,17 @@ export default async function MovementsPage({
                       <span className="text-zinc-600">·</span>
                       {mv.counterpartAccountId ? (
                         <span className="text-zinc-500">
-                          {accountOf(mv.accountId)?.name}{' '}
+                          <AccountName account={f.accountOf(mv.accountId)} />{' '}
                           <span className="text-zinc-400">{mv.direction === 'saida' ? '→' : '←'}</span>{' '}
                           <Link
                             href={href({ conta: mv.counterpartAccountId })}
                             className="text-zinc-300 underline-offset-2 hover:underline"
                           >
-                            {accountOf(mv.counterpartAccountId)?.name}
+                            <AccountName account={f.accountOf(mv.counterpartAccountId)} />
                           </Link>
                         </span>
                       ) : (
-                        <span className="text-zinc-500">{accountOf(mv.accountId)?.name}</span>
+                        <span className="text-zinc-500"><AccountName account={f.accountOf(mv.accountId)} /></span>
                       )}
                     </p>
                   </div>
@@ -211,6 +214,7 @@ export default async function MovementsPage({
                   >
                     {signedMoney(mv.amount, mv.direction)}
                   </span>
+                  <RowMenu items={movementItems(f, mv)} label={mv.description} />
                 </div>
               ))}
             </Card>

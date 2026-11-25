@@ -10,16 +10,17 @@ import {
   Banknote,
   CalendarClock,
   CreditCard,
+  Ellipsis,
   HandCoins,
   Plus,
   type LucideIcon,
 } from 'lucide-react'
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, type ReactNode, useContext, useEffect, useId, useRef, useState } from 'react'
 import { cn } from '@/app/lib/utils'
 import type { FormOptions } from '../_lib/finance'
 import { Dialog } from './fields'
 import { FormSwitch } from './forms'
-import type { FormRequest, NewFormType, SettleTarget } from './types'
+import type { FormRequest, NewFormType, RowItem, SettleTarget } from './types'
 
 const Ctx = createContext<{ open: (r: FormRequest) => void } | null>(null)
 
@@ -98,10 +99,65 @@ export function SettleButton({ target, label }: { target: SettleTarget; label: s
   )
 }
 
+// Menu "…" de uma linha: editar, desfazer, arquivar, excluir. Usa popover
+// nativo para não ser cortado pela rolagem das tabelas.
+export function RowMenu({ items, label }: { items: RowItem[]; label: string }) {
+  const { open } = useForms()
+  const id = useId()
+  const button = useRef<HTMLButtonElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+  if (!items.length) return null
+  const place = () => {
+    const b = button.current?.getBoundingClientRect()
+    const el = menu.current
+    if (!b || !el) return
+    const below = b.bottom + el.offsetHeight + 8 < window.innerHeight
+    el.style.top = `${below ? b.bottom + 4 : Math.max(8, b.top - el.offsetHeight - 4)}px`
+    el.style.left = `${Math.max(8, b.right - el.offsetWidth)}px`
+  }
+  return (
+    <>
+      <button
+        ref={button}
+        type="button"
+        popoverTarget={id}
+        aria-label={`Ações de ${label}`}
+        className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+      >
+        <Ellipsis className="size-4" />
+      </button>
+      <div
+        ref={menu}
+        id={id}
+        popover="auto"
+        onToggle={(e) => e.newState === 'open' && place()}
+        className="fixed m-0 min-w-40 rounded-lg border border-zinc-800 bg-zinc-950 p-1 text-left text-zinc-100 shadow-2xl"
+      >
+        {items.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => {
+              menu.current?.hidePopover()
+              open(item.request)
+            }}
+            className={cn(
+              'block w-full rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-white/5',
+              item.danger ? 'text-red-300' : 'text-zinc-200',
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </>
+  )
+}
+
 const MENU: { type: NewFormType; label: string; hint: string; icon: LucideIcon; group: string }[] = [
   { type: 'despesa', label: 'Despesa à vista', hint: 'Paguei na hora: pix, débito, dinheiro', icon: ArrowUpRight, group: 'Na hora' },
   { type: 'receita', label: 'Receita à vista', hint: 'Recebi na hora', icon: ArrowDownLeft, group: 'Na hora' },
-  { type: 'transferencia', label: 'Transferência', hint: 'Entre contas minhas, saque, depósito', icon: ArrowLeftRight, group: 'Na hora' },
+  { type: 'transferencia', label: 'Transferência', hint: 'Entre meus bancos, saque, depósito', icon: ArrowLeftRight, group: 'Na hora' },
   { type: 'compra', label: 'Compra no crédito', hint: 'Cartão, Shopee, parcelado, pix no crédito', icon: CreditCard, group: 'Crédito' },
   { type: 'emprestimo', label: 'Empréstimo', hint: 'Dinheiro extra do Mercado Pago, Shopee', icon: Banknote, group: 'Crédito' },
   { type: 'pagar', label: 'Conta a pagar', hint: 'Boleto ou conta que vence depois', icon: CalendarClock, group: 'Com vencimento' },

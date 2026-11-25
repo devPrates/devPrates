@@ -1,16 +1,19 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { NewButton } from '../_forms/launchers'
+import { NewButton, RowMenu } from '../_forms/launchers'
 import { cn } from '@/app/lib/utils'
 import { Card } from '../../../_components/ui'
-import { accountOf, loanSummary, loans, totalLoanDebt } from '../_lib/finance'
+import { AccountLogo } from '../_components/account-logo'
+import { getLedger } from '../_lib/data'
+import { loanItems } from '../_lib/row-items'
 import { fullDate, money, percent, shortMonthLabel } from '../_lib/format'
-import { PageHeader, SampleDataNotice, StatCard, StatusBadge } from '../_components/ui'
+import { EmptyState, PageHeader, StatCard, StatusBadge } from '../_components/ui'
 
 export const metadata: Metadata = { title: 'Empréstimos' }
 
-export default function LoansPage() {
-  const list = loans().map((loan) => ({ loan, summary: loanSummary(loan) }))
+export default async function LoansPage() {
+  const f = await getLedger()
+  const list = f.data.loans.map((loan) => ({ loan, summary: f.loanSummary(loan) }))
   const interestTotal = list.reduce((s, l) => s + l.summary.interest, 0)
   const received = list.reduce((s, l) => s + l.loan.principal, 0)
 
@@ -18,29 +21,30 @@ export default function LoansPage() {
     <div className="mx-auto grid max-w-6xl gap-6">
       <PageHeader
         title="Empréstimos"
-        description="Dinheiro extra e crédito pessoal (Mercado Pago, Shopee). O valor recebido entra na conta mas não é receita; as parcelas caem na fatura da conta de crédito e só os juros contam como despesa."
+        description="Dinheiro extra e crédito pessoal (Mercado Pago, Shopee). O valor recebido entra na conta bancária, mas não é receita; as parcelas caem na fatura do cartão ou crédito e só os juros contam como despesa."
         actions={<NewButton type="emprestimo" label="Novo empréstimo" />}
       />
-      <SampleDataNotice />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Ainda devo" value={money(totalLoanDebt())} tone="warning" />
+        <StatCard label="Ainda devo" value={money(f.totalLoanDebt())} tone="warning" />
         <StatCard label="Total já recebido" value={money(received)} hint={`${list.length} empréstimo(s)`} />
         <StatCard label="Juros contratados" value={money(interestTotal)} tone="negative" hint="Somente os juros entram como despesa" />
       </div>
 
+      {list.length === 0 && <EmptyState>Nenhum empréstimo lançado.</EmptyState>}
       <div className="grid gap-4 lg:grid-cols-2">
         {list.map(({ loan, summary }) => {
           const progress = (summary.paidCount / loan.installments) * 100
-          const credit = accountOf(loan.creditAccountId)
+          const credit = f.accountOf(loan.creditAccountId)
           return (
             <Card key={loan.id} className="grid gap-5 p-5">
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <AccountLogo account={credit} size="lg" />
+                <div className="flex-1">
                   <h2 className="font-medium">{loan.description}</h2>
                   <p className="mt-0.5 text-xs text-zinc-500">
-                    Recebido em {fullDate(loan.receivedAt)} na conta{' '}
-                    {accountOf(loan.depositAccountId)?.name} · parcelas na fatura{' '}
+                    Recebido em {fullDate(loan.receivedAt)}
+                    {loan.depositAccountId && ` em ${f.accountOf(loan.depositAccountId)?.name}`} · parcelas na fatura{' '}
                     {credit?.name}
                   </p>
                 </div>
@@ -49,6 +53,7 @@ export default function LoansPage() {
                   <span className="text-lg font-semibold tabular-nums text-amber-300">
                     {money(summary.remaining)}
                   </span>
+                  <RowMenu items={loanItems(f, loan.id)} label={loan.description} />
                 </span>
               </div>
 

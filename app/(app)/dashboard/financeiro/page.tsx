@@ -1,24 +1,15 @@
 import type { Metadata } from 'next'
-import { NewEntryMenu } from './_forms/launchers'
+import { NewButton, NewEntryMenu } from './_forms/launchers'
 import Link from 'next/link'
 import { cn } from '@/app/lib/utils'
 import { Card } from '../../_components/ui'
-import {
-  currentMonth,
-  expensesByCategory,
-  incomeOfMonth,
-  monthOf,
-  payableRows,
-  receivableRows,
-  todayISO,
-  totalBalance,
-  totalLoanDebt,
-} from './_lib/finance'
+import { getLedger } from './_lib/data'
+import { currentMonth, monthOf, todayISO } from './_lib/dates'
 import { money, monthLabel, shortDate } from './_lib/format'
 import {
   CategoryLabel,
+  EmptyState,
   PageHeader,
-  SampleDataNotice,
   Section,
   StatCard,
   StatusBadge,
@@ -28,19 +19,20 @@ export const metadata: Metadata = { title: 'Financeiro' }
 
 const BASE = '/dashboard/financeiro'
 
-export default function FinanceOverview() {
+export default async function FinanceOverview() {
+  const f = await getLedger()
   const month = currentMonth()
   const today = todayISO()
 
-  const payables = payableRows()
-  const receivables = receivableRows()
+  const payables = f.payableRows()
+  const receivables = f.receivableRows()
   const toPay = payables.filter((p) => p.status !== 'paga' && monthOf(p.dueDate) <= month)
   const toReceive = receivables.filter((r) => r.status !== 'paga' && monthOf(r.dueDate) <= month)
   const overdue = [...toPay, ...toReceive].filter((b) => b.status === 'vencida').length
 
-  const expenses = expensesByCategory(month)
+  const expenses = f.expensesByCategory(month)
   const expenseTotal = expenses.reduce((s, e) => s + e.amount, 0)
-  const income = incomeOfMonth(month)
+  const income = f.incomeOfMonth(month)
   const result = income - expenseTotal
 
   // Próximos vencimentos: vencidos primeiro, depois por data.
@@ -67,10 +59,16 @@ export default function FinanceOverview() {
         description={`Resumo de ${monthLabel(month)}.`}
         actions={<NewEntryMenu />}
       />
-      <SampleDataNotice />
+
+      {f.data.accounts.length === 0 && (
+        <EmptyState>
+          <p className="mb-4">Comece cadastrando suas contas bancárias e cartões: onde o dinheiro está e o que você usa no crédito.</p>
+          <NewButton type="conta" label="Cadastrar banco ou cartão" />
+        </EmptyState>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Saldo nas contas" value={money(totalBalance())} hint="Todas as contas de dinheiro" />
+        <StatCard label="Saldo nos bancos" value={money(f.totalBalance())} hint="Contas bancárias e carteira" />
         <StatCard
           label="A pagar até o fim do mês"
           value={money(toPay.reduce((s, p) => s + p.amount, 0))}
@@ -85,7 +83,7 @@ export default function FinanceOverview() {
         />
         <StatCard
           label="Dívida em empréstimos"
-          value={money(totalLoanDebt())}
+          value={money(f.totalLoanDebt())}
           hint={<Link href={`${BASE}/emprestimos`} className="hover:text-zinc-300">Ver empréstimos →</Link>}
           tone="warning"
         />
@@ -101,6 +99,9 @@ export default function FinanceOverview() {
           }
         >
           <Card className="divide-y divide-zinc-800/70">
+            {upcoming.length === 0 && (
+              <p className="px-4 py-8 text-center text-sm text-zinc-500">Nada em aberto até o fim do mês.</p>
+            )}
             {upcoming.map((bill) => (
               <Link
                 key={bill.id}
@@ -160,6 +161,7 @@ export default function FinanceOverview() {
 
           <Section title="Gastos por categoria">
             <Card className="grid gap-3 p-4">
+              {expenses.length === 0 && <p className="text-sm text-zinc-500">Nenhum gasto neste mês.</p>}
               {expenses.map(({ category, amount }) => (
                 <div key={category.id} className="grid gap-1.5">
                   <div className="flex justify-between text-sm">

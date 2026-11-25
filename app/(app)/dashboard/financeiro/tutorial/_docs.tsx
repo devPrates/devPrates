@@ -145,7 +145,7 @@ export const DOCS: DocPage[] = [
         <H>Como ler as páginas</H>
         <P>
           Cada lançamento tem o selo <Code>LANÇAR</Code> e cada baixa o selo <Code>BAIXA</Code>. A página mostra a
-          tela onde fazer, a tabela de <strong className="text-zinc-100">campos</strong> (com o nome usado no banco),
+          tela onde fazer, a tabela de <strong className="text-zinc-100">campos</strong>,
           os <strong className="text-zinc-100">efeitos</strong> e, ao lado, o JSON do registro e das movimentações
           que ele gera.
         </P>
@@ -153,8 +153,8 @@ export const DOCS: DocPage[] = [
     ),
     notes: [
       {
-        tone: 'warning',
-        text: 'Os formulários já existem (botões nas telas e Novo lançamento na Visão geral), mas ainda não salvam: o banco entra na próxima fase. Ao lançar, eles mostram os dados que seriam salvos.',
+        tone: 'info',
+        text: 'Comece cadastrando seus bancos e cartões em Contas bancárias. Para corrigir um lançamento, use o menu "…" da linha: editar, desfazer a baixa ou excluir. Os ids dos exemplos são ilustrativos.',
       },
     ],
   },
@@ -170,7 +170,7 @@ export const DOCS: DocPage[] = [
         <P>
           <strong className="text-zinc-100">Lançar</strong> é registrar que algo existe: uma conta que vai vencer,
           uma compra parcelada, um valor a receber. <strong className="text-zinc-100">Dar baixa</strong> é registrar
-          que foi pago ou recebido de verdade (data, conta e valor). A baixa cria a movimentação e muda o saldo; ela
+          que foi pago ou recebido de verdade (data, banco e valor). A baixa cria a movimentação e muda o saldo; ela
           não é um lançamento novo.
         </P>
         <H>Competência × caixa</H>
@@ -219,7 +219,7 @@ export const DOCS: DocPage[] = [
           ['Comprei no cartão / Shopee / parcelado', <DocLink key="5" slug="compra-no-credito">Compra no crédito</DocLink>, 'a do que comprei', YES],
           ['Fiz um pix no crédito', <DocLink key="6" slug="pix-no-credito">Pix no crédito</DocLink>, 'a do que paguei', YES],
           ['Peguei dinheiro extra / empréstimo', <DocLink key="7" slug="emprestimo">Empréstimo</DocLink>, 'Empréstimo recebido', <span key="j" className="text-amber-300">Só os juros</span>],
-          ['Passei dinheiro entre contas minhas', <DocLink key="8" slug="transferencia">Transferência</DocLink>, 'Transferência', NO],
+          ['Passei dinheiro entre meus bancos', <DocLink key="8" slug="transferencia">Transferência</DocLink>, 'Transferência', NO],
           ['Paguei um boleto já lançado', <DocLink key="9" slug="baixa-conta-a-pagar">Baixa de conta a pagar</DocLink>, '(a da conta)', NO],
           ['Recebi de um cliente já lançado', <DocLink key="10" slug="baixa-conta-a-receber">Baixa de conta a receber</DocLink>, '(a da conta)', NO],
           ['Paguei a fatura', <DocLink key="11" slug="pagar-fatura">Pagar fatura</DocLink>, 'Pagamento de fatura', NO],
@@ -244,13 +244,13 @@ export const DOCS: DocPage[] = [
       F.date(),
       F.description(),
       F.amount(),
-      { name: 'accountId', type: 'Account', required: true, description: 'Conta de onde o dinheiro saiu: Nubank, Banco do Brasil, Carteira.' },
+      { name: 'accountId', type: 'Account', required: true, description: 'Conta bancária (ou carteira) de onde o dinheiro saiu: Nubank, Banco do Brasil, Carteira.' },
       F.category('Categoria de despesa (Mercado, Transporte…).'),
       F.tags(),
       { name: 'direction', type: "'saida'", required: true, description: 'Preenchido pelo botão Nova saída.' },
     ],
     effects: [
-      'Cria uma saída no extrato da conta e diminui o saldo.',
+      'Cria uma saída no extrato do banco e diminui o saldo.',
       'Soma em "gastos por categoria" no mês da data.',
     ],
     notes: [{ tone: 'info', text: 'Débito é à vista. Só é crédito o que vai cair numa fatura.' }],
@@ -292,15 +292,15 @@ export const DOCS: DocPage[] = [
       F.date(),
       F.description(),
       F.amount(),
-      { name: 'accountId', type: 'Account', required: true, description: 'Conta onde o dinheiro caiu.' },
+      { name: 'accountId', type: 'Account', required: true, description: 'Conta bancária onde o dinheiro caiu.' },
       F.category('Categoria de receita (Projetos, Outras receitas…).'),
       F.tags(),
       { name: 'direction', type: "'entrada'", required: true, description: 'Preenchido pelo botão Nova entrada.' },
     ],
     effects: ['Cria uma entrada no extrato e aumenta o saldo.', 'Soma na receita do mês.'],
     notes: [
-      { tone: 'warning', text: 'Se o dinheiro veio de outra conta sua, não é receita: use Transferência.' },
-      { tone: 'info', text: 'Se o cliente já estava em Contas a receber, não lance aqui: dê baixa na conta.' },
+      { tone: 'warning', text: 'Se o dinheiro veio de outra conta bancária sua, não é receita: use Transferência.' },
+      { tone: 'info', text: 'Se o cliente já estava em Contas a receber, não lance aqui: dê baixa nela.' },
     ],
     examples: [
       {
@@ -332,7 +332,7 @@ export const DOCS: DocPage[] = [
     title: 'Conta a pagar',
     kind: 'lancamento',
     summary: 'Boleto, aluguel, luz, imposto: algo com vencimento que você paga depois.',
-    screen: { label: 'Contas a pagar', href: `${FIN}/contas-a-pagar`, action: 'Nova conta' },
+    screen: { label: 'Contas a pagar', href: `${FIN}/contas-a-pagar`, action: 'Nova conta a pagar' },
     model: 'Payable',
     fields: [
       F.description(),
@@ -369,7 +369,7 @@ export const DOCS: DocPage[] = [
     title: 'Conta a receber',
     kind: 'lancamento',
     summary: 'Valor que um cliente vai te pagar numa data: parcela de projeto, mensalidade.',
-    screen: { label: 'Contas a receber', href: `${FIN}/contas-a-receber`, action: 'Nova conta' },
+    screen: { label: 'Contas a receber', href: `${FIN}/contas-a-receber`, action: 'Nova conta a receber' },
     model: 'Receivable',
     fields: [
       F.description(),
@@ -420,11 +420,15 @@ export const DOCS: DocPage[] = [
     ],
     effects: [
       'A compra inteira conta como despesa no mês da compra.',
-      'O sistema divide em parcelas e põe cada uma na fatura do mês certo (a 1ª na fatura seguinte).',
-      'Diminui o limite disponível da conta de crédito.',
+      'O sistema divide em parcelas e põe cada uma na fatura do mês certo, pelo dia de fechamento. O formulário mostra a primeira fatura e deixa trocar.',
+      'Diminui o limite disponível do cartão ou crédito.',
       <>Nada sai do saldo agora: só quando você <DocLink slug="pagar-fatura">pagar a fatura</DocLink>.</>,
     ],
-    notes: [{ tone: 'warning', text: 'Não lance cada parcela como despesa todo mês. A despesa já foi contada na compra.' }],
+    notes: [
+      { tone: 'warning', text: 'Não lance cada parcela como despesa todo mês. A despesa já foi contada na compra.' },
+      { tone: 'info', text: 'Compra que você já estava pagando? Marque "Já paguei algumas parcelas": só as que faltam vão para as faturas.' },
+      { tone: 'info', text: 'Com uma fatura das parcelas já paga, valor e parcelas ficam travados. Desfaça o pagamento da fatura antes.' },
+    ],
     examples: [
       {
         title: 'Registro',
@@ -469,7 +473,7 @@ export const DOCS: DocPage[] = [
       F.description('Ex.: "Pix no crédito: eletricista".'),
       { name: 'total', type: 'number', required: true, description: 'Total que você vai pagar, com os juros do app.' },
       { name: 'installments', type: 'number', required: true, description: 'Número de parcelas.' },
-      { name: 'creditAccountId', type: 'Account (crédito)', required: true, description: 'Conta de crédito usada.' },
+      { name: 'creditAccountId', type: 'Account (crédito)', required: true, description: 'Cartão ou crédito usado.' },
       F.category('Categoria do que foi pago com o pix (Casa, Saúde…).'),
       F.tags(),
       { name: 'kind', type: "'pix_credito'", required: true, description: 'Marca como pix no crédito.' },
@@ -503,14 +507,14 @@ export const DOCS: DocPage[] = [
       F.description(),
       { name: 'receivedAt', type: 'ISODate', required: true, description: 'Dia em que o dinheiro caiu.' },
       { name: 'principal', type: 'number', required: true, description: 'Valor que você recebeu.' },
-      { name: 'depositAccountId', type: 'Account', required: true, description: 'Conta onde o dinheiro caiu (Nubank).' },
-      { name: 'creditAccountId', type: 'Account (crédito)', required: true, description: 'Conta cujas faturas vão ter as parcelas.' },
+      { name: 'depositAccountId', type: 'Account', description: 'Conta bancária onde o dinheiro caiu. Em empréstimo antigo fica vazio: o dinheiro já está no saldo inicial.' },
+      { name: 'creditAccountId', type: 'Account (crédito)', required: true, description: 'Cartão ou crédito cujas faturas vão ter as parcelas.' },
       { name: 'installments', type: 'number', required: true, description: 'Número de parcelas.' },
       { name: 'installmentAmount', type: 'number', required: true, description: 'Valor de cada parcela, com juros.' },
     ],
     effects: [
-      <>Cria uma entrada na conta de depósito na categoria <Code>Empréstimo recebido</Code>, que <strong className="text-zinc-100">não é receita</strong>.</>,
-      'Põe as parcelas nas faturas da conta de crédito, com a etiqueta "Empréstimo".',
+      <>Cria uma entrada na conta bancária na categoria <Code>Empréstimo recebido</Code>, que <strong className="text-zinc-100">não é receita</strong>.</>,
+      'Põe as parcelas nas faturas do cartão ou crédito, com a etiqueta "Empréstimo".',
       <>Calcula os juros: <Code>installments × installmentAmount − principal</Code>. Só eles são despesa, divididos ao longo das parcelas.</>,
       'Mostra saldo devedor, parcelas pagas e taxa média em Empréstimos.',
     ],
@@ -545,9 +549,9 @@ export const DOCS: DocPage[] = [
   {
     slug: 'transferencia',
     group: 'Lançamentos',
-    title: 'Transferência entre contas',
+    title: 'Transferência entre contas bancárias',
     kind: 'lancamento',
-    summary: 'Pix entre contas suas, saque e depósito. O dinheiro só muda de lugar.',
+    summary: 'Pix entre bancos seus, saque e depósito. O dinheiro só muda de lugar.',
     screen: { label: 'Movimentações', href: `${FIN}/movimentacoes?tipo=transferencias`, action: 'Nova transferência' },
     model: 'Transfer',
     fields: [
@@ -559,8 +563,8 @@ export const DOCS: DocPage[] = [
     ],
     effects: [
       'Gera duas movimentações ligadas: saída na origem e entrada no destino.',
-      'Os saldos das duas contas se ajustam; o total do seu dinheiro não muda.',
-      'Não é receita nem despesa. Fica fora de Entradas e Saídas na visão de todas as contas.',
+      'Os saldos dos dois bancos se ajustam; o total do seu dinheiro não muda.',
+      'Não é receita nem despesa. Fica fora de Entradas e Saídas na visão de todos os bancos.',
       'Editar ou excluir a transferência mexe nas duas pernas juntas.',
     ],
     notes: [{ tone: 'info', text: 'Tarifa de TED ou saque: lance à parte como despesa à vista em "Juros e tarifas".' }],
@@ -572,7 +576,7 @@ export const DOCS: DocPage[] = [
   "fromAccountId": "nubank",
   "toAccountId": "bb",
   "amount": 500,
-  "description": "Pix para a conta do BB"
+  "description": "Pix para o BB"
 }`,
       },
       {
@@ -599,8 +603,8 @@ export const DOCS: DocPage[] = [
     model: 'Payable',
     fields: [
       { name: 'paidAt', type: 'ISODate', required: true, description: 'Dia em que você pagou.' },
-      { name: 'accountId', type: 'Account', required: true, description: 'Conta usada para pagar.' },
-      { name: 'paidAmount', type: 'number', description: 'Só se pagou valor diferente (multa, juros, desconto). A diferença vai para "Juros e tarifas". Campo novo, entra com o formulário.' },
+      { name: 'accountId', type: 'Account', required: true, description: 'Conta bancária usada para pagar.' },
+      { name: 'paidAmount', type: 'number', description: 'Só se pagou valor diferente (multa, juros, desconto). O que passar vai para "Juros e tarifas"; desconto reduz a despesa da conta.' },
     ],
     effects: [
       <>A conta vira <Code>paga</Code>.</>,
@@ -640,7 +644,7 @@ export const DOCS: DocPage[] = [
     model: 'Receivable',
     fields: [
       { name: 'receivedAt', type: 'ISODate', required: true, description: 'Dia em que o dinheiro caiu.' },
-      { name: 'accountId', type: 'Account', required: true, description: 'Conta onde caiu.' },
+      { name: 'accountId', type: 'Account', required: true, description: 'Conta bancária onde caiu.' },
     ],
     effects: [
       <>A conta vira <Code>recebida</Code>.</>,
@@ -672,7 +676,7 @@ export const DOCS: DocPage[] = [
     group: 'Baixas',
     title: 'Pagar fatura',
     kind: 'baixa',
-    summary: 'Baixa da fatura de uma conta de crédito. A fatura não é lançada: ela é montada sozinha.',
+    summary: 'Baixa da fatura de um cartão ou crédito. A fatura não é lançada: ela é montada sozinha.',
     screen: { label: 'Faturas', href: `${FIN}/faturas`, action: 'Pagar fatura (ou na linha da fatura em Contas a pagar)' },
     model: 'Invoice (calculada)',
     body: (
@@ -683,7 +687,7 @@ export const DOCS: DocPage[] = [
     ),
     fields: [
       { name: 'paidAt', type: 'ISODate', required: true, description: 'Dia do pagamento.' },
-      { name: 'accountId', type: 'Account', required: true, description: 'Conta de onde saiu o dinheiro.' },
+      { name: 'accountId', type: 'Account', required: true, description: 'Conta bancária de onde saiu o dinheiro.' },
     ],
     effects: [
       <>A fatura vira <Code>paga</Code> e libera o limite.</>,
@@ -721,10 +725,10 @@ export const DOCS: DocPage[] = [
     title: 'Desfazer baixa',
     kind: 'baixa',
     summary: 'Voltar uma conta ou fatura para em aberto quando a baixa foi feita errada.',
-    screen: { label: 'Contas a pagar / a receber / Faturas', href: `${FIN}/contas-a-pagar`, action: 'Desfazer baixa' },
+    screen: { label: 'Contas a pagar / a receber / Faturas', href: `${FIN}/contas-a-pagar`, action: 'Menu “…” → Desfazer baixa' },
     fields: [],
     effects: [
-      <>Apaga <Code>paidAt</Code> / <Code>receivedAt</Code> e a movimentação que a baixa criou.</>,
+      'Apaga a baixa e a movimentação que ela criou.',
       'O saldo volta ao que era. A despesa ou receita continua lançada.',
       'Depois, dê a baixa de novo com os dados certos.',
     ],
@@ -800,8 +804,8 @@ export const DOCS: DocPage[] = [
   "categoryId": "presentes",
   "tagIds": ["encontros", "presentes"]
 }
-// no banco: tabela de ligação
-// entry_tags (entry_id, tag_id)`,
+// no banco: uma tabela de ligação por
+// tipo de lançamento`,
       },
     ],
   },
@@ -815,7 +819,7 @@ export const DOCS: DocPage[] = [
       <Rows
         head={['Errado', 'Certo']}
         rows={[
-          ['Transferência entre contas lançada como receita.', <DocLink key="1" slug="transferencia">Transferência</DocLink>],
+          ['Transferência entre bancos lançada como receita.', <DocLink key="1" slug="transferencia">Transferência</DocLink>],
           ['Empréstimo recebido lançado como receita.', <DocLink key="2" slug="emprestimo">Empréstimo</DocLink>],
           ['Pagamento da fatura lançado como despesa.', <DocLink key="3" slug="pagar-fatura">Pagar fatura</DocLink>],
           ['Cada parcela lançada como despesa todo mês.', <><DocLink slug="compra-no-credito">Compra no crédito</DocLink> uma vez, com o total</>],
@@ -838,14 +842,14 @@ export const DOCS: DocPage[] = [
           rows={[
             ['Todo dia', 'Lançar gastos à vista e compras no crédito; dar baixa no que pagou ou recebeu.'],
             ['Toda semana', 'Ver os próximos vencimentos na Visão geral; lançar as contas que chegaram; conferir vencidas e atrasadas.'],
-            ['Todo mês', 'Conciliar as contas; conferir a fatura antes de pagar; ver gastos por categoria e o resultado.'],
+            ['Todo mês', 'Conciliar os bancos; conferir a fatura antes de pagar; ver gastos por categoria e o resultado.'],
           ]}
         />
         <H>Conciliação</H>
         <P>
-          Conciliar é comparar o saldo de cada conta no sistema com o saldo no app do banco. Use o filtro de conta em{' '}
+          Conciliar é comparar o saldo de cada conta bancária no sistema com o saldo no app do banco. Use o filtro de banco em{' '}
           <a href={`${FIN}/movimentacoes`} className="text-zinc-100 underline decoration-zinc-600 underline-offset-2">Movimentações</a>{' '}
-          para ver o extrato de uma conta só e comparar linha a linha. Se não bater, falta ou sobra algum lançamento:
+          para ver o extrato de um banco só e comparar linha a linha. Se não bater, falta ou sobra algum lançamento:
           ache e corrija, sem lançar um ajuste.
         </P>
       </>

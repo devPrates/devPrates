@@ -11,7 +11,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "test": "tsx --test \"app/**/*.test.ts\""
   },
   "dependencies": {
     "@graphcms/rich-text-react-renderer": "^0.6.2",
@@ -47,6 +48,7 @@
     "@types/three": "^0.187.0",
     "drizzle-kit": "^0.31.11",
     "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }

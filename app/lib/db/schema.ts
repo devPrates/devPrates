@@ -123,6 +123,8 @@ export const accounts = finance.table(
     limitCents: integer('limit_cents'),
     closingDay: smallint('closing_day'),
     dueDay: smallint('due_day'),
+    // Código SVG da logo, já conferido por normalizeSvg.
+    logoSvg: text('logo_svg'),
     archivedAt: archivedAt(),
     ...timestamps(),
   },

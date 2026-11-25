@@ -8,7 +8,7 @@ export default function SettingsPage() {
     <div className="mx-auto grid max-w-5xl gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
-        <p className="mt-1 text-sm text-zinc-400">Conta e preferências da área restrita.</p>
+        <p className="mt-1 text-sm text-zinc-400">Acesso e preferências da área restrita.</p>
       </div>
       <UnderConstruction title="Configurações" />
     </div>

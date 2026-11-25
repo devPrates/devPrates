@@ -3,24 +3,18 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { cn } from '@/app/lib/utils'
 import { Card } from '../../../_components/ui'
-import {
-  accountOf,
-  currentMonth,
-  monthOf,
-  parseMonth,
-  tagOf,
-  tags,
-  tagSummary,
-  type TaggedEntry,
-  type TaggedEntryKind,
-} from '../_lib/finance'
+import { NewButton, RowMenu } from '../_forms/launchers'
+import { AccountName } from '../_components/account-logo'
+import { getLedger } from '../_lib/data'
+import { currentMonth, monthOf, parseMonth } from '../_lib/dates'
+import type { TaggedEntry, TaggedEntryKind } from '../_lib/finance'
+import { tagItems } from '../_lib/row-items'
 import { money, monthLabel, shortDate, signedMoney, upperFirst } from '../_lib/format'
 import {
   CategoryLabel,
   EmptyState,
   MonthNav,
   PageHeader,
-  SampleDataNotice,
   Section,
   StatCard,
   Tabs,
@@ -45,8 +39,9 @@ export default async function TagsPage({
 }: {
   searchParams: Promise<{ tag?: string; mes?: string }>
 }) {
+  const f = await getLedger()
   const params = await searchParams
-  const tag = tagOf(params.tag)
+  const tag = f.tagOf(params.tag)
   // Sem ?mes=, mostra todo o período.
   const month = params.mes ? parseMonth(params.mes) : undefined
 
@@ -74,22 +69,31 @@ export default async function TagsPage({
   )
 
   if (!tag) {
-    const rows = tags().map((t) => ({ tag: t, ...tagSummary(t.id, month) }))
+    const rows = f.data.tags
+      .map((t) => ({ tag: t, ...f.tagSummary(t.id, month) }))
+      .sort((a, b) => Number(a.tag.archived) - Number(b.tag.archived))
     return (
       <div className="mx-auto grid max-w-5xl gap-6">
         <PageHeader
           title="Tags"
           description="Marcadores livres, além da categoria. A categoria diz o que foi o gasto (Combustível); a tag diz para que ou com quem (Encontros). Um lançamento pode ter várias tags."
-          actions={period}
+          actions={
+            <>
+              {period}
+              <NewButton type="tag" label="Nova tag" />
+            </>
+          }
         />
-        <SampleDataNotice />
+        {rows.length === 0 && <EmptyState>Nenhuma tag cadastrada.</EmptyState>}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map(({ tag: t, spent, count }) => (
-            <Link key={t.id} href={href({ tag: t.id })} className="group">
+            <div key={t.id} className={cn('relative', t.archived && 'opacity-60')}>
+            <Link href={href({ tag: t.id })} className="group">
               <Card className="grid h-full gap-3 p-4 transition-colors group-hover:border-zinc-700">
                 <div className="flex items-center gap-2">
                   <span className={cn('size-2.5 rounded-full', t.color)} />
                   <span className="font-medium text-zinc-100">{t.name}</span>
+                  {t.archived && <Tag>Arquivada</Tag>}
                 </div>
                 {t.description && <p className="text-xs text-zinc-500">{t.description}</p>}
                 <div className="mt-auto flex items-end justify-between">
@@ -100,13 +104,17 @@ export default async function TagsPage({
                 </div>
               </Card>
             </Link>
+            <div className="absolute right-3 top-3">
+              <RowMenu items={tagItems(t)} label={t.name} />
+            </div>
+            </div>
           ))}
         </div>
       </div>
     )
   }
 
-  const summary = tagSummary(tag.id, month)
+  const summary = f.tagSummary(tag.id, month)
   const byMonth = new Map<string, TaggedEntry[]>()
   for (const e of summary.entries) byMonth.set(monthOf(e.date), [...(byMonth.get(monthOf(e.date)) ?? []), e])
   const spentCount = summary.entries.filter((e) => e.direction === 'saida').length
@@ -118,13 +126,17 @@ export default async function TagsPage({
       </Link>
       <PageHeader
         title={tag.name}
-        description={tag.description ?? 'Todos os lançamentos com esta tag, de qualquer categoria e conta.'}
-        actions={period}
+        description={tag.description ?? 'Todos os lançamentos com esta tag, de qualquer categoria, banco ou cartão.'}
+        actions={
+          <>
+            {period}
+            <RowMenu items={tagItems(tag)} label={tag.name} />
+          </>
+        }
       />
-      <SampleDataNotice />
 
       <div className="flex flex-wrap gap-1.5">
-        {tags().map((t) => (
+        {f.data.tags.filter((t) => !t.archived || t.id === tag.id).map((t) => (
           <Link
             key={t.id}
             href={href({ tag: t.id })}
@@ -177,7 +189,7 @@ export default async function TagsPage({
                           {e.accountId && (
                             <>
                               <span className="text-zinc-600">·</span>
-                              <span className="text-zinc-500">{accountOf(e.accountId)?.name}</span>
+                              <span className="text-zinc-500"><AccountName account={f.accountOf(e.accountId)} /></span>
                             </>
                           )}
                           {e.tagIds

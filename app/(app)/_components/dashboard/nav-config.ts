@@ -128,7 +128,7 @@ const RAW_MODULES: RawModule[] = [
   {
     id: 'financeiro',
     title: 'Financeiro',
-    description: 'Contas, lançamentos e relatórios',
+    description: 'Bancos, contas a pagar, lançamentos e relatórios',
     icon: Wallet,
     groups: [
       { items: [...START, s('tutorial', 'Como usar', BookOpen)] },
@@ -150,7 +150,7 @@ const RAW_MODULES: RawModule[] = [
       {
         heading: 'Cadastros',
         items: [
-          s('contas', 'Contas', Landmark),
+          s('contas-bancarias', 'Contas bancárias', Landmark),
           s('categorias', 'Categorias', Tags),
           s('tags', 'Tags', Tag),
         ],

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
-import { NewButton, SettleButton } from '../_forms/launchers'
+import { NewButton, RowMenu, SettleButton } from '../_forms/launchers'
 import { cn } from '@/app/lib/utils'
-import { monthOf, parseMonth, receivableRows, todayISO } from '../_lib/finance'
+import { getLedger } from '../_lib/data'
+import { monthOf, parseMonth, todayISO } from '../_lib/dates'
+import { receivableItems } from '../_lib/row-items'
 import { fullDate, money } from '../_lib/format'
 import type { BillStatus } from '../_lib/types'
 import {
@@ -9,7 +11,6 @@ import {
   EmptyState,
   MonthNav,
   PageHeader,
-  SampleDataNotice,
   StatCard,
   StatusBadge,
   Table,
@@ -36,12 +37,13 @@ export default async function ReceivablesPage({
 }: {
   searchParams: Promise<{ mes?: string; status?: string }>
 }) {
+  const f = await getLedger()
   const params = await searchParams
   const month = parseMonth(params.mes)
   const status = FILTERS.find((f) => f.key === params.status)?.key ?? 'todas'
   const today = todayISO()
 
-  const ofMonth = receivableRows().filter((r) => monthOf(r.dueDate) === month)
+  const ofMonth = f.receivableRows().filter((r) => monthOf(r.dueDate) === month)
   const list = ofMonth.filter((r) => status === 'todas' || r.status === status)
   const sum = (s: BillStatus) =>
     ofMonth.filter((r) => r.status === s).reduce((t, r) => t + r.amount, 0)
@@ -53,12 +55,11 @@ export default async function ReceivablesPage({
         description="Entradas com data prevista: projetos, manutenções e outros valores que alguém vai te pagar. Receber é dar baixa, o que gera a movimentação de entrada."
         actions={
           <>
-            <NewButton type="receber" label="Nova conta" />
+            <NewButton type="receber" label="Nova conta a receber" />
             <MonthNav month={month} basePath={PATH} params={{ status }} />
           </>
         }
       />
-      <SampleDataNotice />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Previsto no mês" value={money(ofMonth.reduce((t, r) => t + r.amount, 0))} hint={`${ofMonth.length} recebimento(s)`} />
@@ -91,8 +92,8 @@ export default async function ReceivablesPage({
             <tr key={r.id} className="transition-colors hover:bg-white/[0.02]">
               <td className={cn(td, 'whitespace-nowrap tabular-nums', r.status === 'vencida' ? 'text-red-300' : 'text-zinc-400')}>
                 {fullDate(r.dueDate)}
-                {r.receivedAt && r.receivedAt !== r.dueDate && (
-                  <span className="block text-xs text-zinc-600">recebido {fullDate(r.receivedAt)}</span>
+                {r.settlement && r.settlement.date !== r.dueDate && (
+                  <span className="block text-xs text-zinc-600">recebido {fullDate(r.settlement.date)}</span>
                 )}
               </td>
               <td className={td}>
@@ -117,9 +118,10 @@ export default async function ReceivablesPage({
                 {r.status !== 'paga' && (
                   <SettleButton
                     label="Receber"
-                    target={{ kind: 'receber', id: r.id, description: r.description, amount: r.amount, dueDate: r.dueDate, accountId: r.accountId }}
+                    target={{ kind: 'receber', id: r.id, description: r.description, amount: r.amount, dueDate: r.dueDate }}
                   />
-                )}
+                )}{' '}
+                <RowMenu items={receivableItems(f, r.id)} label={r.description} />
               </td>
             </tr>
           ))}

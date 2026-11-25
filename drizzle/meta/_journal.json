@@ -15,6 +15,20 @@
       "when": 1795637713567,
       "tag": "0001_finance_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795639168928,
+      "tag": "0002_bank_transfer_category",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795639978888,
+      "tag": "0003_account_logo",
+      "breakpoints": true
     }
   ]
 }

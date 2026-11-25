@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { NewButton, SettleButton } from '../_forms/launchers'
+import { NewButton, RowMenu, SettleButton } from '../_forms/launchers'
 import { cn } from '@/app/lib/utils'
-import { accountOf, monthOf, parseMonth, payableRows, todayISO } from '../_lib/finance'
+import { AccountName } from '../_components/account-logo'
+import { getLedger } from '../_lib/data'
+import { monthOf, parseMonth, todayISO } from '../_lib/dates'
+import { invoiceItems, payableItems } from '../_lib/row-items'
 import { fullDate, money, shortMonthLabel } from '../_lib/format'
 import type { BillStatus } from '../_lib/types'
 import {
@@ -10,7 +13,6 @@ import {
   EmptyState,
   MonthNav,
   PageHeader,
-  SampleDataNotice,
   StatCard,
   StatusBadge,
   Table,
@@ -36,12 +38,13 @@ export default async function PayablesPage({
 }: {
   searchParams: Promise<{ mes?: string; status?: string }>
 }) {
+  const f = await getLedger()
   const params = await searchParams
   const month = parseMonth(params.mes)
   const status = FILTERS.find((f) => f.key === params.status)?.key ?? 'todas'
   const today = todayISO()
 
-  const ofMonth = payableRows().filter((p) => monthOf(p.dueDate) === month)
+  const ofMonth = f.payableRows().filter((p) => monthOf(p.dueDate) === month)
   const list = ofMonth.filter((p) => status === 'todas' || p.status === status)
   const sum = (s: BillStatus) =>
     ofMonth.filter((p) => p.status === s).reduce((t, p) => t + p.amount, 0)
@@ -50,16 +53,15 @@ export default async function PayablesPage({
     <div className="mx-auto grid max-w-6xl gap-6">
       <PageHeader
         title="Contas a pagar"
-        description="Compromissos com vencimento: contas avulsas (aluguel, luz, boletos) e as faturas das contas de crédito. Pagar é só dar baixa; a despesa não é lançada de novo."
+        description="Compromissos com vencimento: contas avulsas (aluguel, luz, boletos) e as faturas dos cartões e créditos. Pagar é só dar baixa; a despesa não é lançada de novo."
         actions={
           <>
-            <NewButton type="pagar" label="Nova conta" />
+            <NewButton type="pagar" label="Nova conta a pagar" />
             <NewButton type="compra" label="Compra no crédito" variant="ghost" />
             <MonthNav month={month} basePath={PATH} params={{ status }} />
           </>
         }
       />
-      <SampleDataNotice />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total do mês" value={money(ofMonth.reduce((t, p) => t + p.amount, 0))} hint={`${ofMonth.length} conta(s)`} />
@@ -116,7 +118,7 @@ export default async function PayablesPage({
               <td className={td}>
                 {p.origin.kind === 'fatura' ? (
                   <span className="text-xs text-zinc-500">
-                    Itens em {accountOf(p.origin.accountId)?.name}
+                    Itens em <AccountName account={f.accountOf(p.origin.accountId)} />
                   </span>
                 ) : (
                   <CategoryLabel categoryId={p.categoryId} />
@@ -132,6 +134,9 @@ export default async function PayablesPage({
               </td>
               <td className={cn(td, 'text-right font-medium tabular-nums text-zinc-200')}>
                 {money(p.amount)}
+                {p.paidAmount !== undefined && p.paidAmount !== p.amount && (
+                  <span className="block text-xs font-normal text-zinc-500">pago {money(p.paidAmount)}</span>
+                )}
               </td>
               <td className={cn(td, 'w-0 whitespace-nowrap text-right')}>
                 {p.status !== 'paga' && (
@@ -144,9 +149,14 @@ export default async function PayablesPage({
                       amount: p.amount,
                       dueDate: p.dueDate,
                       creditAccountId: p.origin.kind === 'fatura' ? p.origin.accountId : undefined,
+                      month: p.origin.kind === 'fatura' ? p.origin.month : undefined,
                     }}
                   />
-                )}
+                )}{' '}
+                <RowMenu
+                  items={p.origin.kind === 'fatura' ? invoiceItems(p.origin.paymentId) : payableItems(f, p.id)}
+                  label={p.description}
+                />
               </td>
             </tr>
           ))}

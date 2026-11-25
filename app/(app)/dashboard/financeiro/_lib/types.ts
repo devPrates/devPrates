@@ -1,6 +1,6 @@
-// Modelo do financeiro, no formato dos ERPs. Cada tipo aqui vira uma tabela
-// no Postgres quando o backend existir. Datas em ISO (YYYY-MM-DD) e valores
-// em reais (number); no banco, valores vão em centavos (integer).
+// Modelo do financeiro, no formato dos ERPs. As tabelas estão em
+// app/lib/db/schema.ts. Aqui, datas em ISO (YYYY-MM-DD), meses em YYYY-MM e
+// valores em reais (number); no banco, valores ficam em centavos.
 //
 // Regra de ouro: todo gasto entra em UM lugar só.
 // - Tem vencimento? Conta a pagar (avulsa) ou parcela numa fatura de crédito.
@@ -24,6 +24,9 @@ export type Account = {
   limit?: number
   closingDay?: number
   dueDay?: number
+  // Endereço da logo, se houver.
+  logo?: string
+  archived: boolean
 }
 
 // Natureza da categoria:
@@ -32,37 +35,52 @@ export type Account = {
 //   (empréstimo recebido, pagamento de fatura, transferência).
 export type CategoryKind = 'despesa' | 'receita' | 'neutra'
 
+// Categorias que os cálculos usam; não podem ser editadas.
+export type SystemKey = 'juros' | 'emprestimo-recebido' | 'pagamento-fatura' | 'transferencia'
+
 export type Category = {
   id: string
   name: string
   kind: CategoryKind
   // Cor do marcador (classe Tailwind de fundo).
   color: string
+  systemKey?: SystemKey
+  archived: boolean
 }
 
 // Tag: marcador livre, além da categoria. A categoria diz O QUE foi o gasto
 // (Combustível); a tag diz PARA QUE ou COM QUEM (Encontros). Um lançamento
-// pode ter várias tags; no banco vira uma tabela de ligação (lançamento × tag).
+// pode ter várias tags.
 export type FinanceTag = {
   id: string
   name: string
   // Cor do marcador (classe Tailwind de fundo).
   color: string
   description?: string
+  archived: boolean
+}
+
+// Parcelamento. `firstInstallment` é a primeira parcela registrada aqui (4 numa
+// compra que entrou no sistema na 4/10) e `firstInvoiceMonth` é o mês de
+// vencimento da fatura dela.
+export type InstallmentPlan = {
+  installments: number
+  firstInstallment: number
+  firstInvoiceMonth: string
 }
 
 // Empréstimo / dinheiro extra (Mercado Pago, Shopee). O valor recebido NÃO é
 // receita; as parcelas caem na fatura da conta de crédito. Juros = total das
 // parcelas - valor recebido, e só os juros são despesa.
-export type Loan = {
+export type Loan = InstallmentPlan & {
   id: string
   description: string
   creditAccountId: string
-  // Conta onde o dinheiro caiu.
-  depositAccountId: string
+  // Conta onde o dinheiro caiu. Vazio em empréstimo antigo (o dinheiro já está
+  // no saldo inicial).
+  depositAccountId?: string
   receivedAt: ISODate
   principal: number
-  installments: number
   installmentAmount: number
 }
 
@@ -71,7 +89,7 @@ export type Loan = {
 // só compõem as faturas.
 export type CreditPurchaseKind = 'compra' | 'pix_credito'
 
-export type CreditPurchase = {
+export type CreditPurchase = InstallmentPlan & {
   id: string
   description: string
   kind: CreditPurchaseKind
@@ -79,10 +97,12 @@ export type CreditPurchase = {
   categoryId: string
   date: ISODate
   total: number
-  installments: number
-  // Marcadores livres para filtrar depois (ex.: Encontros, Trabalho).
-  tagIds?: string[]
+  tagIds: string[]
 }
+
+// Baixa: quando, em que conta e quanto de fato foi pago (pode ter multa, juros
+// ou desconto).
+export type Settlement = { date: ISODate; accountId: string; amount: number }
 
 // Conta a pagar avulsa (boleto, aluguel, conta de luz…). As faturas de
 // crédito também aparecem em "Contas a pagar", mas são calculadas (Invoice).
@@ -92,12 +112,9 @@ export type Payable = {
   categoryId: string
   amount: number
   dueDate: ISODate
-  paidAt?: ISODate
-  // Conta usada para pagar (na baixa).
-  accountId?: string
+  settlement?: Settlement
   supplier?: string
-  // Marcadores livres para filtrar depois (ex.: Encontros, Trabalho).
-  tagIds?: string[]
+  tagIds: string[]
 }
 
 export type Receivable = {
@@ -106,11 +123,9 @@ export type Receivable = {
   categoryId: string
   amount: number
   dueDate: ISODate
-  receivedAt?: ISODate
-  accountId?: string
+  settlement?: Settlement
   customer?: string
-  // Marcadores livres para filtrar depois (ex.: Encontros, Trabalho).
-  tagIds?: string[]
+  tagIds: string[]
 }
 
 // Despesa ou receita resolvida na hora, sem vencimento (pix, débito,
@@ -123,8 +138,7 @@ export type CashEntry = {
   accountId: string
   amount: number
   direction: 'entrada' | 'saida'
-  // Marcadores livres para filtrar depois (ex.: Encontros, Trabalho).
-  tagIds?: string[]
+  tagIds: string[]
 }
 
 // Transferência entre contas de dinheiro (saque, depósito, pix entre contas
@@ -139,6 +153,16 @@ export type Transfer = {
   toAccountId: string
   amount: number
   description?: string
+}
+
+// Pagamento de uma fatura. Sem ele, a fatura está em aberto.
+export type InvoicePayment = {
+  id: string
+  creditAccountId: string
+  month: string
+  paidAt: ISODate
+  paidFromAccountId: string
+  amount: number
 }
 
 // ---------- Calculados (não são tabelas) ----------
@@ -162,13 +186,13 @@ export type InvoiceStatus = 'paga' | 'aberta' | 'vencida' | 'futura'
 export type Invoice = {
   id: string
   accountId: string
-  // Mês de referência da fatura (YYYY-MM).
+  // Mês de vencimento da fatura (YYYY-MM).
   month: string
   dueDate: ISODate
   items: InvoiceItem[]
   total: number
   status: InvoiceStatus
-  paidAt?: ISODate
+  payment?: InvoicePayment
 }
 
 export type BillStatus = 'paga' | 'aberta' | 'vencida'
@@ -181,8 +205,12 @@ export type PayableRow = {
   amount: number
   status: BillStatus
   paidAt?: ISODate
+  // Valor pago, quando já foi (pode diferir de amount).
+  paidAmount?: number
   categoryId?: string
-  origin: { kind: 'avulsa'; supplier?: string } | { kind: 'fatura'; accountId: string; month: string }
+  origin:
+    | { kind: 'avulsa'; supplier?: string }
+    | { kind: 'fatura'; accountId: string; month: string; paymentId?: string }
 }
 
 export type MovementSource =
@@ -203,8 +231,9 @@ export type Movement = {
   amount: number
   direction: 'entrada' | 'saida'
   source: MovementSource
-  // Só transferências: a transferência de origem e a conta do outro lado.
-  transferId?: string
+  // Registro que gerou a movimentação: o que se edita, desfaz ou exclui.
+  sourceId: string
+  // Só transferências: a conta do outro lado.
   counterpartAccountId?: string
   tagIds?: string[]
 }

@@ -2,53 +2,60 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { cn } from '@/app/lib/utils'
 import { Card } from '../../../_components/ui'
-import {
-  balanceOf,
-  creditAccounts,
-  creditUsage,
-  currentMonth,
-  invoiceOf,
-  moneyAccounts,
-  totalBalance,
-} from '../_lib/finance'
+import { NewButton, RowMenu } from '../_forms/launchers'
+import { AccountLogo, AccountName } from '../_components/account-logo'
+import { getLedger } from '../_lib/data'
+import { currentMonth } from '../_lib/dates'
+import { accountItems } from '../_lib/row-items'
 import { fullDate, money } from '../_lib/format'
 import type { AccountKind } from '../_lib/types'
-import { PageHeader, SampleDataNotice, Section, StatusBadge, Tag } from '../_components/ui'
+import { EmptyState, PageHeader, Section, StatusBadge, Tag } from '../_components/ui'
 
-export const metadata: Metadata = { title: 'Contas' }
+export const metadata: Metadata = { title: 'Contas bancárias' }
 
 const KIND_LABEL: Record<AccountKind, string> = {
   corrente: 'Conta corrente',
   carteira: 'Dinheiro',
   poupanca: 'Poupança',
-  credito: 'Crédito',
+  credito: 'Cartão / crédito',
 }
 
-export default function AccountsPage() {
+export default async function AccountsPage() {
+  const f = await getLedger()
   const month = currentMonth()
+  const cash = f.moneyAccounts.filter((a) => !a.archived)
+  const credit = f.creditAccounts.filter((a) => !a.archived)
+  const archived = f.data.accounts.filter((a) => a.archived)
 
   return (
     <div className="mx-auto grid max-w-6xl gap-8">
       <PageHeader
-        title="Contas"
-        description="Onde o dinheiro está (contas e carteira) e de onde vem o crédito (cartões, Mercado Pago, Shopee). Contas de crédito não têm saldo: têm limite e fatura."
+        title="Contas bancárias e cartões"
+        description="Onde o dinheiro está (bancos e carteira) e de onde vem o crédito (cartões, Mercado Pago, Shopee). Cartão e crédito não têm saldo: têm limite e fatura."
+        actions={<NewButton type="conta" label="Novo banco ou cartão" />}
       />
-      <SampleDataNotice />
 
-      <Section title={`Dinheiro · ${money(totalBalance())}`}>
+      <Section title={`Bancos e carteira · ${money(f.totalBalance())}`}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {moneyAccounts().map((a) => (
+          {cash.length === 0 && <EmptyState>Nenhuma conta bancária ou carteira.</EmptyState>}
+          {cash.map((a) => (
             <Card key={a.id} className="grid gap-3 p-4">
               <div className="flex items-start justify-between gap-2">
-                <div>
+                <div className="flex items-center gap-3">
+                  <AccountLogo account={a} size="lg" />
+                  <div>
                   <p className="font-medium">{a.name}</p>
                   <p className="text-xs text-zinc-500">{a.institution}</p>
+                  </div>
                 </div>
-                <Tag>{KIND_LABEL[a.kind]}</Tag>
+                <span className="flex items-center gap-1">
+                  <Tag>{KIND_LABEL[a.kind]}</Tag>
+                  <RowMenu items={accountItems(a)} label={a.name} />
+                </span>
               </div>
               <div>
                 <p className="text-xs text-zinc-500">Saldo atual</p>
-                <p className="text-xl font-semibold tabular-nums">{money(balanceOf(a.id))}</p>
+                <p className="text-xl font-semibold tabular-nums">{money(f.balanceOf(a.id))}</p>
               </div>
               <Link
                 href={`/dashboard/financeiro/movimentacoes?conta=${a.id}`}
@@ -61,28 +68,36 @@ export default function AccountsPage() {
         </div>
       </Section>
 
-      <Section title="Crédito">
+      <Section title="Cartões e crédito">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {creditAccounts().map((a) => {
-            const usage = creditUsage(a.id)
-            const invoice = invoiceOf(a.id, month)
+          {credit.length === 0 && <EmptyState>Nenhum cartão ou crédito.</EmptyState>}
+          {credit.map((a) => {
+            const usage = f.creditUsage(a.id)
+            const invoice = f.invoiceOf(a.id, month)
             const pct = usage.limit ? Math.min(100, (usage.used / usage.limit) * 100) : 0
             return (
               <Card key={a.id} className="grid gap-3 p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <div>
+                  <div className="flex items-center gap-3">
+                    <AccountLogo account={a} size="lg" />
+                    <div>
                     <p className="font-medium">{a.name}</p>
                     <p className="text-xs text-zinc-500">
                       {a.institution} · fecha dia {a.closingDay} · vence dia {a.dueDay}
                     </p>
+                    </div>
                   </div>
-                  <Tag>{KIND_LABEL[a.kind]}</Tag>
+                  <span className="flex items-center gap-1">
+                    <Tag>{KIND_LABEL[a.kind]}</Tag>
+                    <RowMenu items={accountItems(a)} label={a.name} />
+                  </span>
                 </div>
                 <div className="grid gap-1.5">
                   <div className="flex justify-between text-xs text-zinc-500">
                     <span>Limite comprometido</span>
                     <span className="tabular-nums">
-                      {money(usage.used)} / {money(usage.limit)}
+                      {money(usage.used)}
+                      {usage.limit !== undefined && ` / ${money(usage.limit)}`}
                     </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
@@ -91,7 +106,7 @@ export default function AccountsPage() {
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <p className="text-xs text-zinc-500">Disponível: {money(usage.available)}</p>
+                  <p className="text-xs text-zinc-500">{usage.available === undefined ? 'Sem limite cadastrado' : `Disponível: ${money(usage.available)}`}</p>
                 </div>
                 <Link
                   href={`/dashboard/financeiro/faturas?conta=${a.id}&mes=${month}`}
@@ -117,6 +132,22 @@ export default function AccountsPage() {
           })}
         </div>
       </Section>
+
+      {archived.length > 0 && (
+        <Section title="Arquivados">
+          <Card className="divide-y divide-zinc-800/70">
+            {archived.map((a) => (
+              <div key={a.id} className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-500">
+                <span className="flex-1">
+                  <AccountName account={a} />
+                </span>
+                <Tag>{KIND_LABEL[a.kind]}</Tag>
+                <RowMenu items={accountItems(a)} label={a.name} />
+              </div>
+            ))}
+          </Card>
+        </Section>
+      )}
     </div>
   )
 }

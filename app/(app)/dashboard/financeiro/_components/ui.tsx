@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 import { cn } from '@/app/lib/utils'
 import { Card } from '../../../_components/ui'
-import { addMonths, categoryOf, tagOf } from '../_lib/finance'
+import { getLedger } from '../_lib/data'
+import { addMonths } from '../_lib/dates'
 import { monthLabel, upperFirst } from '../_lib/format'
 import type { BillStatus, InvoiceStatus } from '../_lib/types'
 
@@ -27,15 +28,6 @@ export function PageHeader({
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
-  )
-}
-
-// Aviso fixo de que os números ainda são de exemplo.
-export function SampleDataNotice() {
-  return (
-    <p className="rounded-lg border border-dashed border-zinc-800 px-3 py-2 text-xs text-zinc-500">
-      Dados de exemplo: as telas ainda não estão ligadas ao banco.
-    </p>
   )
 }
 
@@ -109,8 +101,8 @@ export function Tag({ children, className }: { children: ReactNode; className?: 
   )
 }
 
-export function CategoryLabel({ categoryId }: { categoryId?: string }) {
-  const category = categoryOf(categoryId)
+export async function CategoryLabel({ categoryId }: { categoryId?: string }) {
+  const category = (await getLedger()).categoryOf(categoryId)
   if (!category) return <span className="text-zinc-600">—</span>
   return (
     <span className="inline-flex items-center gap-1.5 text-zinc-300">
@@ -121,8 +113,8 @@ export function CategoryLabel({ categoryId }: { categoryId?: string }) {
 }
 
 // Chip de tag. Com href, vira link para o relatório da tag.
-export function TagChip({ tagId, href }: { tagId: string; href?: string }) {
-  const tag = tagOf(tagId)
+export async function TagChip({ tagId, href }: { tagId: string; href?: string }) {
+  const tag = (await getLedger()).tagOf(tagId)
   if (!tag) return null
   const body = (
     <>
@@ -181,7 +173,7 @@ export function Tabs({
   items,
   active,
 }: {
-  items: { key: string; label: string; href: string }[]
+  items: { key: string; label: ReactNode; href: string }[]
   active: string
 }) {
   return (

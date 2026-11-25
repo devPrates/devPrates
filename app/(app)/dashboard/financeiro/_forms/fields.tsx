@@ -3,22 +3,18 @@
 // Peças dos formulários do financeiro. Cada formulário usa só as que precisa;
 // nada aqui sabe de regra de negócio.
 import { Check, Plus, X } from 'lucide-react'
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/app/lib/utils'
-import { addDays, todayISO } from '../_lib/dates'
-import { fullDate, money } from '../_lib/format'
+import { AccountLogo } from '../_components/account-logo'
+import { addDays, addMonths, currentMonth, todayISO } from '../_lib/dates'
+import { fullDate, money, monthLabel } from '../_lib/format'
+import { maskMoney, moneyText, parseMoney, pasteMoney, toggleSign } from '../_lib/money'
+import { normalizeSvg, svgDataUri } from '../_lib/svg'
 import type { Account, Category, FinanceTag, ISODate } from '../_lib/types'
 
 // ---------- Valor ----------
 
-// Aceita "1.234,56", "1234,56" e "1234.56".
-export function parseMoney(text: string): number {
-  const t = text.trim().replace(/\s|R\$/g, '')
-  if (!t) return NaN
-  const normalized = t.includes(',') ? t.replace(/\./g, '').replace(',', '.') : t
-  const n = Number(normalized)
-  return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN
-}
+export { moneyText, parseMoney }
 
 export const isPositive = (n: number) => Number.isFinite(n) && n > 0
 
@@ -142,34 +138,182 @@ export function TextInput({
   )
 }
 
+// Input de reais: digita só números e a pontuação entra sozinha (money.ts).
+function MaskedMoney({
+  value,
+  onChange,
+  negative,
+  className,
+  ...props
+}: {
+  value: string
+  onChange: (v: string) => void
+  negative?: boolean
+  className: string
+  id?: string
+  autoFocus?: boolean
+  disabled?: boolean
+}) {
+  const ref = useRef<HTMLInputElement>(null)
+  // Cursor sempre no fim, para o número não embaralhar. Seleção de trecho
+  // (para substituir) continua valendo.
+  const toEnd = () => {
+    const el = ref.current
+    if (!el || el.selectionStart !== el.selectionEnd || el.selectionEnd === el.value.length) return
+    el.setSelectionRange(el.value.length, el.value.length)
+  }
+  useLayoutEffect(() => {
+    if (document.activeElement === ref.current) toEnd()
+  }, [value])
+  return (
+    <input
+      {...props}
+      ref={ref}
+      inputMode="numeric"
+      autoComplete="off"
+      placeholder="0,00"
+      value={value}
+      onChange={(e) => onChange(maskMoney(e.target.value, value, negative))}
+      onPaste={(e) => {
+        e.preventDefault()
+        const pasted = pasteMoney(e.clipboardData.getData('text'), negative)
+        if (pasted !== undefined) onChange(pasted)
+      }}
+      onSelect={toEnd}
+      className={cn('min-w-0 flex-1 bg-transparent tabular-nums text-zinc-100 outline-none', className)}
+    />
+  )
+}
+
 // Campo de valor em destaque: é o primeiro de todo formulário.
 export function MoneyInput({
   value,
   onChange,
   label = 'Valor',
   hint,
+  disabled,
 }: {
   value: string
   onChange: (v: string) => void
   label?: string
   hint?: ReactNode
+  disabled?: boolean
 }) {
   const id = useId()
   return (
     <Row label={label} htmlFor={id} hint={hint}>
       <div className="flex h-14 items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-4 focus-within:border-zinc-500 focus-within:ring-2 focus-within:ring-zinc-500/30">
         <span className="text-lg text-zinc-500">R$</span>
-        <input
+        <MaskedMoney
           id={id}
-          autoFocus
-          inputMode="decimal"
-          placeholder="0,00"
+          autoFocus={!disabled}
+          disabled={disabled}
           value={value}
-          onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ''))}
-          className="min-w-0 flex-1 bg-transparent text-2xl font-semibold tabular-nums text-zinc-100 outline-none placeholder:text-zinc-700"
+          onChange={onChange}
+          className="text-2xl font-semibold placeholder:text-zinc-700 disabled:text-zinc-500"
         />
       </div>
     </Row>
+  )
+}
+
+// Campo de valor secundário (parcela, limite, valor pago).
+export function MoneyField({
+  value,
+  onChange,
+  negative,
+  id,
+}: {
+  value: string
+  onChange: (v: string) => void
+  negative?: boolean
+  id?: string
+}) {
+  return (
+    <div className="flex h-10 items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900 px-3 focus-within:border-zinc-500">
+      <span className="text-sm text-zinc-500">R$</span>
+      <MaskedMoney id={id} value={value} onChange={onChange} negative={negative} className="text-sm placeholder:text-zinc-600" />
+      {negative && (
+        <button
+          type="button"
+          onClick={() => onChange(toggleSign(value))}
+          aria-label="Trocar entre positivo e negativo"
+          aria-pressed={value.startsWith('-')}
+          className="rounded border border-zinc-700 px-1.5 py-0.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
+        >
+          +/−
+        </button>
+      )}
+    </div>
+  )
+}
+
+export function NumberField({
+  value,
+  onChange,
+  min,
+  max,
+  id,
+}: {
+  value: string
+  onChange: (v: string) => void
+  min: number
+  max: number
+  id?: string
+}) {
+  return (
+    <input
+      id={id}
+      type="number"
+      min={min}
+      max={max}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={cn(inputCls, 'w-24')}
+    />
+  )
+}
+
+// Cores dos marcadores. Escritas por extenso para o Tailwind gerar as classes.
+export const COLORS = [
+  'bg-sky-400', 'bg-cyan-400', 'bg-teal-400', 'bg-emerald-400', 'bg-green-400', 'bg-lime-400',
+  'bg-yellow-400', 'bg-amber-400', 'bg-orange-400', 'bg-red-400', 'bg-rose-400', 'bg-pink-400',
+  'bg-fuchsia-400', 'bg-violet-400', 'bg-indigo-400', 'bg-stone-400', 'bg-zinc-400', 'bg-zinc-500', 'bg-zinc-600',
+]
+
+export function ColorPicker({ value, onChange }: { value: string; onChange: (c: string) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {COLORS.map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          aria-label={c.replace('bg-', '')}
+          aria-pressed={c === value}
+          className={cn('size-6 rounded-full', c, c === value && 'ring-2 ring-zinc-100 ring-offset-2 ring-offset-zinc-950')}
+        />
+      ))}
+    </div>
+  )
+}
+
+export function MonthSelect({ value, onChange }: { value: string; onChange: (m: string) => void }) {
+  const now = currentMonth()
+  const months = Array.from({ length: 37 }, (_, i) => addMonths(now, i - 24))
+  if (!months.includes(value)) months.unshift(value)
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={cn(inputCls, '[color-scheme:dark]')}
+    >
+      {months.map((m) => (
+        <option key={m} value={m}>
+          {monthLabel(m)}
+        </option>
+      ))}
+    </select>
   )
 }
 
@@ -204,16 +348,34 @@ function Chip({
   )
 }
 
+export function ChoicePicker<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { id: T; name: string }[]
+  value: T
+  onChange: (id: T) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((o) => (
+        <Chip key={o.id} active={o.id === value} onClick={() => onChange(o.id)}>
+          {o.name}
+        </Chip>
+      ))}
+    </div>
+  )
+}
+
 export function AccountPicker({
   accounts,
   value,
   onChange,
-  disabledId,
 }: {
   accounts: Account[]
   value: string
   onChange: (id: string) => void
-  disabledId?: string
 }) {
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -222,8 +384,8 @@ export function AccountPicker({
           key={a.id}
           active={a.id === value}
           onClick={() => onChange(a.id)}
-          className={a.id === disabledId ? 'pointer-events-none opacity-30' : undefined}
         >
+          <AccountLogo account={a} />
           {a.name}
         </Chip>
       ))}
@@ -284,6 +446,7 @@ export function DatePicker({
       ))}
       <input
         type="date"
+        max={future ? undefined : today}
         value={value}
         onChange={(e) => e.target.value && onChange(e.target.value)}
         className={cn(
@@ -315,9 +478,9 @@ export function InstallmentsPicker({
       <input
         type="number"
         min={1}
-        max={48}
+        max={120}
         value={value}
-        onChange={(e) => onChange(Math.max(1, Math.min(48, Number(e.target.value) || 1)))}
+        onChange={(e) => onChange(Math.max(1, Math.min(120, Number(e.target.value) || 1)))}
         aria-label="Outro número de parcelas"
         className="h-[34px] w-16 rounded-md border border-zinc-800 bg-zinc-900 px-2 text-[13px] text-zinc-300 outline-none focus-visible:border-zinc-500"
       />
@@ -330,6 +493,14 @@ export function InstallmentsPicker({
   )
 }
 
+// Marca as tags que ainda não existem: "nova:Nome".
+const NEW_TAG = 'nova:'
+export const newTagName = (id: string) => (id.startsWith(NEW_TAG) ? id.slice(NEW_TAG.length) : undefined)
+export const splitTags = (ids: string[]) => ({
+  tagIds: ids.filter((id) => !newTagName(id)),
+  newTags: ids.flatMap((id) => newTagName(id) ?? []),
+})
+
 export function TagPicker({
   tags,
   value,
@@ -339,7 +510,7 @@ export function TagPicker({
   value: string[]
   onChange: (ids: string[]) => void
 }) {
-  // Tags criadas aqui ficam só neste formulário (ainda sem banco).
+  // Tags criadas aqui só vão para o banco junto com o lançamento.
   const [extra, setExtra] = useState<FinanceTag[]>([])
   const [adding, setAdding] = useState(false)
   const [name, setName] = useState('')
@@ -349,7 +520,7 @@ export function TagPicker({
     const n = name.trim()
     if (!n) return setAdding(false)
     const existing = all.find((t) => t.name.toLowerCase() === n.toLowerCase())
-    const tag = existing ?? { id: `nova-${n.toLowerCase().replace(/\s+/g, '-')}`, name: n, color: 'bg-zinc-400' }
+    const tag = existing ?? { id: NEW_TAG + n, name: n, color: 'bg-zinc-400', archived: false }
     if (!existing) setExtra([...extra, tag])
     if (!value.includes(tag.id)) onChange([...value, tag.id])
     setName('')
@@ -391,6 +562,7 @@ export function TagPicker({
               setAdding(false)
             }
           }}
+          maxLength={40}
           placeholder="Nome da tag"
           className="h-7 w-32 rounded-full border border-zinc-600 bg-zinc-900 px-3 text-xs text-zinc-100 outline-none"
         />
@@ -429,17 +601,76 @@ export function Checkbox({
   )
 }
 
+// ---------- Logo ----------
+
+// undefined mantém a atual, null remove, texto troca.
+export type LogoChange = string | null | undefined
+
+export const logoError = (value: LogoChange) => {
+  if (!value?.trim()) return undefined
+  const result = normalizeSvg(value)
+  return result.ok ? undefined : result.error
+}
+
+export function LogoField({
+  id,
+  name,
+  current,
+  value,
+  onChange,
+}: {
+  id?: string
+  name: string
+  current?: string
+  value: LogoChange
+  onChange: (v: LogoChange) => void
+}) {
+  const [brokenSrc, setBrokenSrc] = useState<string>()
+  const result = value?.trim() ? normalizeSvg(value) : undefined
+  const src = result ? (result.ok ? svgDataUri(result.svg) : undefined) : value === null ? undefined : current
+  const error = result && !result.ok ? result.error : src && src === brokenSrc ? 'O navegador não conseguiu desenhar este SVG. Confira se o código está completo.' : undefined
+  return (
+    <div className="grid gap-2">
+      <div className="flex items-start gap-3">
+        <AccountLogo account={{ name: name || '?' }} src={src} size="lg" />
+        <textarea
+          id={id}
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value || undefined)}
+          rows={3}
+          spellCheck={false}
+          placeholder={current && value !== null ? 'Cole aqui para trocar a logo atual' : '<svg …>…</svg>'}
+          className="min-w-0 flex-1 resize-y rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 font-mono text-xs text-zinc-100 outline-none placeholder:text-zinc-600 focus-visible:border-zinc-500"
+        />
+      </div>
+      {/* Só para saber se a imagem abre. */}
+      {src?.startsWith('data:') && <img key={src} src={src} alt="" hidden onError={() => setBrokenSrc(src)} />}
+      {error && <p className="text-xs text-red-300">{error}</p>}
+      {current && value === undefined && (
+        <button type="button" onClick={() => onChange(null)} className="w-fit text-xs text-zinc-400 underline underline-offset-2 hover:text-zinc-200">
+          Remover logo
+        </button>
+      )}
+      {value === null && (
+        <button type="button" onClick={() => onChange(undefined)} className="w-fit text-xs text-zinc-400 underline underline-offset-2 hover:text-zinc-200">
+          A logo será removida ao salvar. Manter
+        </button>
+      )}
+    </div>
+  )
+}
+
 // ---------- Prévia e rodapé ----------
 
 export type PreviewLine = { tone?: 'in' | 'out' | 'neutral' | 'warn'; text: ReactNode }
 
 // "O que vai acontecer": atualiza enquanto você digita. É o antídoto contra o
 // formulário genérico: dá para ver antes de lançar onde cada valor vai cair.
-export function Preview({ lines, children }: { lines: PreviewLine[]; children?: ReactNode }) {
-  if (!lines.length && !children) return null
+export function Preview({ lines, title = 'O que vai acontecer' }: { lines: PreviewLine[]; title?: string }) {
+  if (!lines.length) return null
   return (
     <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">O que vai acontecer</p>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{title}</p>
       <ul className="grid gap-1.5 text-[13px]">
         {lines.map((l, i) => (
           <li key={i} className="flex gap-2">
@@ -456,7 +687,6 @@ export function Preview({ lines, children }: { lines: PreviewLine[]; children?: 
           </li>
         ))}
       </ul>
-      {children}
     </div>
   )
 }
@@ -470,11 +700,13 @@ export function FormFooter({
   submitLabel,
   disabled,
   missing,
+  danger,
 }: {
   onCancel: () => void
   submitLabel: string
   disabled: boolean
   missing?: string
+  danger?: boolean
 }) {
   return (
     <div className="flex items-center justify-between gap-3 border-t border-zinc-800 px-5 py-3">
@@ -490,7 +722,10 @@ export function FormFooter({
         <button
           type="submit"
           disabled={disabled}
-          className="h-9 rounded-md bg-zinc-100 px-4 text-sm font-medium text-zinc-900 transition-colors hover:bg-white disabled:opacity-40"
+          className={cn(
+            'h-9 rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-40',
+            danger ? 'bg-red-500 text-white hover:bg-red-400' : 'bg-zinc-100 text-zinc-900 hover:bg-white',
+          )}
         >
           {submitLabel}
         </button>
@@ -499,21 +734,17 @@ export function FormFooter({
   )
 }
 
-// Tela depois de lançar. Sem banco ainda: mostra o que seria salvo.
+// Tela depois de salvar um lançamento novo.
 export function Done({
   title,
   lines,
-  payload,
   onAgain,
   onClose,
-  againLabel = 'Lançar outro',
 }: {
   title: string
   lines: PreviewLine[]
-  payload: unknown
   onAgain?: () => void
   onClose: () => void
-  againLabel?: string
 }) {
   return (
     <div className="grid gap-4 px-5 py-6">
@@ -521,18 +752,9 @@ export function Done({
         <span className="flex size-9 items-center justify-center rounded-full bg-emerald-950 text-emerald-300">
           <Check className="size-4" />
         </span>
-        <div>
-          <p className="font-semibold">{title}</p>
-          <p className="text-xs text-amber-300/90">Simulação: ainda não é salvo. O banco entra na próxima fase.</p>
-        </div>
+        <p className="font-semibold">{title}</p>
       </div>
-      <Preview lines={lines} />
-      <details className="rounded-lg border border-zinc-800">
-        <summary className="cursor-pointer px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300">Ver dados que seriam salvos</summary>
-        <pre className="overflow-x-auto border-t border-zinc-800 p-3 font-mono text-[11px] leading-relaxed text-zinc-400">
-          {JSON.stringify(payload, null, 2)}
-        </pre>
-      </details>
+      <Preview lines={lines} title="O que aconteceu" />
       <div className="flex justify-end gap-2">
         {onAgain && (
           <button
@@ -540,7 +762,7 @@ export function Done({
             onClick={onAgain}
             className="h-9 rounded-md border border-zinc-800 px-3 text-sm text-zinc-300 transition-colors hover:bg-white/5"
           >
-            {againLabel}
+            Lançar outro
           </button>
         )}
         <button
