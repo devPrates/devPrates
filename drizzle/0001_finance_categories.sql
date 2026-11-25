@@ -1,0 +1,21 @@
+-- Categorias padrão. As que têm system_key são usadas pelos cálculos.
+INSERT INTO "finance"."categories" ("name", "kind", "color", "system_key") VALUES
+	('Moradia', 'despesa', 'bg-sky-400', NULL),
+	('Mercado', 'despesa', 'bg-emerald-400', NULL),
+	('Combustível', 'despesa', 'bg-yellow-400', NULL),
+	('Transporte', 'despesa', 'bg-amber-400', NULL),
+	('Assinaturas', 'despesa', 'bg-violet-400', NULL),
+	('Casa', 'despesa', 'bg-teal-400', NULL),
+	('Eletrônicos', 'despesa', 'bg-indigo-400', NULL),
+	('Vestuário', 'despesa', 'bg-pink-400', NULL),
+	('Saúde', 'despesa', 'bg-rose-400', NULL),
+	('Lazer', 'despesa', 'bg-orange-400', NULL),
+	('Presentes', 'despesa', 'bg-fuchsia-400', NULL),
+	('Impostos e taxas', 'despesa', 'bg-stone-400', NULL),
+	('Juros e tarifas', 'despesa', 'bg-red-400', 'juros'),
+	('Projetos', 'receita', 'bg-lime-400', NULL),
+	('Manutenção mensal', 'receita', 'bg-green-400', NULL),
+	('Outras receitas', 'receita', 'bg-cyan-400', NULL),
+	('Empréstimo recebido', 'neutra', 'bg-zinc-400', 'emprestimo-recebido'),
+	('Pagamento de fatura', 'neutra', 'bg-zinc-500', 'pagamento-fatura'),
+	('Transferência entre contas', 'neutra', 'bg-zinc-600', 'transferencia');
